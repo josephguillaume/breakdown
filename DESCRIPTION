@@ -6,4 +6,5 @@ Date: 2014-05-20
 Author: Joseph Guillaume
 Maintainer: Joseph Guillaume <joseph.guillaume@gmail.com>
 Description: Hierarchical breakdown of an analysis and analysis of breakeven and cross-over points
+Depends: compiler,ggplot2
 License: GPL-3
