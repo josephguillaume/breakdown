@@ -20,45 +20,29 @@ readCsv = function(files,handler){
     }
 }
 
-csvToEquations=function(csv){
-//TODO: might be better to change all in one go
-	// for (var i=0; i<csv.length; i++) {
-		// equations.set(csv[i][0],csv[i][1]); //TODO: generalise to loading multiple sets of equations
-	// }	
-	csv.splice(0,1); //remove header
-	equations.set("equations",csv)
-	console.log(equations);
-}
-
-createEquationsTable=function(model){
-	var data=model.get("equations");
-	data=data.map(function(x){return({name:x[0],scen1:x[1],scen2:x[2]});});
-	$("#dg-equations").datagrid({
-		data: data,
-		columns:[[
-		{field:'name',title:'Name',width:220},
-		{field:'scen1',title:'Scenario 1',width:300},
-		{field:'scen2',title:'Scenario 2',width:300}
-		]],
-		fit:true
-	});	
-	$('#win-dg-equations').window('open')
-	console.log("dg");
-}
-
-
 var Analysis = Backbone.Model.extend({
 	defaults: {
 		equations: [],
-		header:[]
+		header:[],
+		ranges:[],
+		scens:[1,2],
+		selected_var1: null
 	},
-	fromCSV:function(csv){
-		console.log("fromCSV");
-		//console.log(equations);
-		//console.log(this);
-		this.set({header:csv[0]})
+	EquationsfromCSV:function(csv){
+		console.log("EquationsfromCSV");
+		this.set('header',csv[0])
 		csv.splice(0,1); //remove header
-		this.set({equations:csv});
+		this.set('equations',csv);
+		return this;
+	},
+	delVar:function(variable){
+		console.log('delVar '+variable);
+		if(variable==undefined) return(this);
+		var vals=this.get('equations').slice(0); //clone, because otherwise this bypasses set
+		var i=vals.map(function(x){return(x[0])}).indexOf(variable);
+		vals.splice(i,1);
+		this.set('equations',vals);
+		if(variable==this.selected_var1) this.set("selected_var1",null);
 		return this;
 	},
 	evaluate:function(column,variable){
@@ -68,13 +52,25 @@ var Analysis = Backbone.Model.extend({
 			dict[this.get('equations')[i][0]]=this.get('equations')[i][column]
 		}
 		var model=this;
-		ocpu.call("evaluate",{expr:variable,equations:dict},function(session){session.getObject(function(data){ 
+		var req=ocpu.rpc("evaluate",{expr:variable,equations:dict},function(data){ 
 			console.log('evaluate is setting '+variable+' for column '+column);
 			var vals=model.get(variable).slice(0); //clone, because otherwise this bypasses set
 			if(vals==undefined) vals=[];
-			vals[column]=data[0]; //assuming	 its a scalar
+			vals[column]=data[0]; //assuming its a scalar
 			model.set(variable,vals);
-		})});
+		})
+		req.fail(function(){
+			$.messager.show({
+					title:'Error',
+					msg:req.responseText,
+					timeout:5000,
+					showType:'slide'
+					});
+			var vals=model.get(variable).slice(0);
+			if(vals==undefined) vals=[];
+			vals[column]=NaN;
+			model.set(variable,vals);
+		});
 		return this;
 	}
 	//univariate
@@ -84,32 +80,80 @@ var Analysis = Backbone.Model.extend({
 	//staged SCE
 }); 
 
+$.extend($.fn.datagrid.methods, {
+	editCell: function(jq,param){
+		return jq.each(function(){
+			var opts = $(this).datagrid('options');
+			var fields = $(this).datagrid('getColumnFields',true).concat($(this).datagrid('getColumnFields'));
+			for(var i=0; i<fields.length; i++){
+				var col = $(this).datagrid('getColumnOption', fields[i]);
+				col.editor1 = col.editor;
+				if (fields[i] != param.field){
+					col.editor = null;
+				}
+			}
+			$(this).datagrid('beginEdit', param.index);
+			for(var i=0; i<fields.length; i++){
+				var col = $(this).datagrid('getColumnOption', fields[i]);
+				col.editor = col.editor1;
+			}
+		});
+	}
+});
+
+function deleterow(dg,model){
+	console.log('deleterow')
+	var selected=dg.datagrid('getSelected');
+	if(selected==null) return(null)
+	$.messager.confirm('Confirm','Are you sure?',function(r){
+		if (r){
+			//dg.datagrid('deleteRow',dg.getRowIndex(selected)); //whole datagrid will be reset anyway
+			model.delVar(selected.name);
+		}
+	});
+}
+
+function addrow(dg){
+	dg.datagrid("appendRow",{
+		name:'',
+		scen1:'',
+		scen2:''
+	})
+}
 
 var DGEquations = Backbone.View.extend({
     initialize: function(){
-        this.model.on('change', this.render, this);
-        ;this.render();
+        this.model.on('change:equations', this.render, this);
+		this.model.on('change:scens', this.render, this);
+		this.model.on('change:selected_var1',this.setSelected,this)
+        this.render();
     }, 
-	scens:[1,2],
+	setSelected:function(){
+		var selected=this.model.get('selected_var1');
+		if(selected) this.$el.datagrid('selectRecord',selected);
+	},
     render: function() {
-		//if(this.model.header==undefined) return(null);
 		var model=this.model;
-		var scens=this.scens;
+		var scens=model.get("scens");
 		var data=model.get("equations");
 		data=data.map(function(x){return({name:x[0],scen1:x[scens[0]],scen2:x[scens[1]]});});
-		//console.log(this.$el);
 		this.$el.datagrid({
 			data: data,
+			idField:'name',
 			columns:[[
 			//TODO: sortable:true
 			{field:'name',title:model.get('header')[0],width:220,editor:'text'},
 			{field:'scen1',title:model.get('header')[scens[0]],width:300,editor:'text'},
 			{field:'scen2',title:model.get('header')[scens[1]],width:300,editor:'text'}
 			]],
+			singleSelect:true,
 			fit:true,
-			onClickCell: function(index,field,value){
+			onSelect: function(index,rowData){
+				model.set("selected_var1",rowData[0]);
+			},
+			onDblClickCell: function(index,field,value){
 				var dg=$(this);
-				dg.datagrid('beginEdit', index);
+				dg.datagrid('editCell', {index:index,field:field});
 				var ed = dg.datagrid('getEditor', {index:index,field:field});
 				$(ed.target).focus();
 				//TODO: hide other editors
@@ -125,9 +169,11 @@ var DGEquations = Backbone.View.extend({
 			onAfterEdit: function(index,rowData,changes){
 									console.log('DGEquations onAfterEdit');
 									var data=model.get('equations').map(function(arr){return arr.slice();});
+									if(index >= data.length) data[index]=[]; //add a new variable
 									if(changes.scen1) data[index][scens[0]]=changes.scen1;
 									if(changes.scen2) data[index][scens[1]]=changes.scen2;
 									//TODO: allow renaming throughout the matrix	
+									if(changes.name) data[index][0]=changes.name;
 									model.set('equations',data);
                                 },
 			checkOnSelect:false,

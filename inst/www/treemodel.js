@@ -47,7 +47,7 @@
         var treeModel = new TreeModel(); 
     
         treeModel.fetch({
-                         url:'/tree_data3.json', 
+                         url:'tree_data3.json', 
                          success: function(){ console.log("tree loaded"); },
                          error: function(model, response, options){ console.log("error loading tree"); },
                         });

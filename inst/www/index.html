@@ -20,7 +20,7 @@
 	</div>
 	</div>
     	
-	<input type="file" id="csvEquationsInput" onchange="readCsv(this.files,function(x){analysis.fromCSV(x)})" accept=".csv">
+	<input type="file" id="csvEquationsInput" onchange="readCsv(this.files,function(x){analysis.EquationsfromCSV(x)})" accept=".csv">
 			
 	<a href="javascript:void(0)" class="easyui-linkbutton" onclick="$('#win-dg-equations').window('open');">Equations</a>
 	<a href="javascript:void(0)" class="easyui-linkbutton" onclick="get_ranges()">Set ranges</a>
@@ -31,7 +31,11 @@
 	
 	<div id="win-dg-equations" class="easyui-window" closed="true" style="width:600px;height:400px" title="Equations">
 		<div class="easyui-panel" data-options="fit:true">
-			<table id="dg-equations"></table>
+			<div id="eq_tb">
+				<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick='addrow($("#dg-equations"))'>Add</a>
+				<a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick='deleterow($("#dg-equations"),analysis)'>Delete</a>
+			</div>
+			<table id="dg-equations" toolbar="#eq_tb"></table>
 		</div>
 	</div>	
 			
