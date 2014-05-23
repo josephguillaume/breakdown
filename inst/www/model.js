@@ -35,13 +35,13 @@ var Analysis = Backbone.Model.extend({
 		this.set('equations',csv);
 		return this;
 	},
-	delVar:function(variable){
-		console.log('delVar '+variable);
+	delVar:function(variable,dgname){
+		console.log('delVar '+variable+' in '+dgname);
 		if(variable==undefined) return(this);
-		var vals=this.get('equations').slice(0); //clone, because otherwise this bypasses set
+		var vals=this.get(dgname).slice(0); //clone, because otherwise this bypasses set
 		var i=vals.map(function(x){return(x[0])}).indexOf(variable);
 		vals.splice(i,1);
-		this.set('equations',vals);
+		this.set(dgname,vals);
 		if(variable==this.selected_var1) this.set("selected_var1",null);
 		return this;
 	},
@@ -101,24 +101,22 @@ $.extend($.fn.datagrid.methods, {
 	}
 });
 
-function deleterow(dg,model){
+function deleterow(dg,model,dgname){
 	console.log('deleterow')
 	var selected=dg.datagrid('getSelected');
 	if(selected==null) return(null)
 	$.messager.confirm('Confirm','Are you sure?',function(r){
 		if (r){
 			//dg.datagrid('deleteRow',dg.getRowIndex(selected)); //whole datagrid will be reset anyway
-			model.delVar(selected.name);
+			model.delVar(selected.name,dgname);
 		}
 	});
 }
 
 function addrow(dg){
-	dg.datagrid("appendRow",{
-		name:'',
-		scen1:'',
-		scen2:''
-	})
+	var obj={};
+	for(n in dg.datagrid('getColumnFields')) obj[n]='';
+	dg.datagrid("appendRow",obj);
 }
 
 var DGEquations = Backbone.View.extend({
@@ -130,6 +128,7 @@ var DGEquations = Backbone.View.extend({
     }, 
 	setSelected:function(){
 		var selected=this.model.get('selected_var1');
+		console.log("setSelected on equations "+selected);
 		if(selected) this.$el.datagrid('selectRecord',selected);
 	},
     render: function() {
@@ -149,14 +148,14 @@ var DGEquations = Backbone.View.extend({
 			singleSelect:true,
 			fit:true,
 			onSelect: function(index,rowData){
-				model.set("selected_var1",rowData[0]);
+				console.log("equations selected "+rowData.name);
+				model.set("selected_var1",rowData.name);
 			},
 			onDblClickCell: function(index,field,value){
 				var dg=$(this);
 				dg.datagrid('editCell', {index:index,field:field});
 				var ed = dg.datagrid('getEditor', {index:index,field:field});
 				$(ed.target).focus();
-				//TODO: hide other editors
 				$(ed.target).on('blur',function(e){
 					e.stopPropagation();
 					dg.datagrid('endEdit', index);
@@ -176,6 +175,95 @@ var DGEquations = Backbone.View.extend({
 									if(changes.name) data[index][0]=changes.name;
 									model.set('equations',data);
                                 },
+			checkOnSelect:false,
+			selectOnCheck:false
+		});
+        return this;
+   }
+
+});
+
+var DGRanges = Backbone.View.extend({
+    initialize: function(){
+        this.model.on('change:ranges', this.render, this);
+		this.model.on('change:equations', this.render, this);
+		this.model.on('change:selected_var1',this.setSelected,this)
+        this.render();
+    }, 
+	setSelected:function(){
+		var selected=this.model.get('selected_var1');
+		console.log("setSelected on ranges "+selected);
+		if(selected) this.$el.datagrid('selectRecord',selected);
+	},
+    render: function() {
+		var model=this.model;
+		var scens=model.get("scens");
+		var data=model.get("ranges");
+		//TODO: show modeled value automatically updated
+		data=data.map(function(x){return({name:x[0],Lower:x[1],Min:x[2],Max:x[3],Upper:x[4]});});
+		this.$el.datagrid({
+			data: data,
+			idField:'name',
+			columns:[[
+			//TODO: sortable:true
+			{field:'name',title:model.get('header')[0],width:220,
+				editor:{
+					type:'combobox',
+					options:{
+						valueField:'value',
+						textField:'value',
+						//TODO: only allow the variable if it has the same value in each column?
+						data:model.get("equations").map(function(x){return({value:x[0]})})
+					}
+				}
+			},
+			{field:'Lower',title:"Analysis min",width:100,editor:'text'},
+			{field:'Min',title:"Min",width:100,editor:'text'},
+			{field:'Max',title:"Max",width:100,editor:'text'},
+			{field:'Upper',title:"Analysis max",width:100,editor:'text'}
+			]],
+			singleSelect:true,
+			fit:true,
+			onSelect: function(index,rowData){
+				console.log("range selected "+rowData.name);
+				model.set("selected_var1",rowData.name);
+			},
+			onDblClickCell: function(index,field,value){
+				var dg=$(this);
+				dg.datagrid('editCell', {index:index,field:field});
+				var ed = dg.datagrid('getEditor', {index:index,field:field});
+				if(ed.type=="combobox"){
+					//cursor is in input that is siblings child, not in target directly
+					$(ed.target).next().children("input").focus();
+					$(document).on('keydown',function(e){
+						if(e.keyCode==13){dg.datagrid('endEdit', index);$(document).off('keydown');return false;}
+					}).on('keydown',function(e){
+						if(e.keyCode==27){dg.datagrid('cancelEdit', index);$(document).off('keydown');return false;}
+					});
+				} else {
+					$(ed.target).focus();
+					$(ed.target).on('blur',function(e){
+						e.stopPropagation();
+						dg.datagrid('endEdit', index);
+					}).on('keydown',function(e){
+						if(e.keyCode==13){dg.datagrid('endEdit', index);return false;}
+					}).on('keydown',function(e){
+						if(e.keyCode==27){dg.datagrid('cancelEdit', index);return false;}
+					});
+				}
+				console.log(ed);
+			},
+			onAfterEdit: function(index,rowData,changes){
+				console.log('DGRanges onAfterEdit');
+				var dg = $(this);
+				var data=model.get('ranges').map(function(arr){return arr.slice();});
+				if(index >= data.length) data[index]=[]; //add a new variable
+				//TODO: evaluate the new variable's modeled value
+				$.each(changes, function(key, value) {
+					data[index][dg.datagrid('getColumnFields').indexOf(key)]=value;
+				});
+				model.set('ranges',data);
+			},
 			checkOnSelect:false,
 			selectOnCheck:false
 		});

@@ -23,7 +23,7 @@
 	<input type="file" id="csvEquationsInput" onchange="readCsv(this.files,function(x){analysis.EquationsfromCSV(x)})" accept=".csv">
 			
 	<a href="javascript:void(0)" class="easyui-linkbutton" onclick="$('#win-dg-equations').window('open');">Equations</a>
-	<a href="javascript:void(0)" class="easyui-linkbutton" onclick="get_ranges()">Set ranges</a>
+	<a href="javascript:void(0)" class="easyui-linkbutton" onclick="$('#win-dg-ranges').window('open');">Set ranges</a>
 	<a href="javascript:void(0)" class="easyui-linkbutton" onclick="run_univariate()">Single variable breakeven</a>
 	<a href="javascript:void(0)" class="easyui-linkbutton" onclick="plot_univariate()">Single variable plot</a>
 	<a href="javascript:void(0)" class="easyui-linkbutton" onclick="run_equiconcern()">Many variable breakeven</a>
@@ -33,12 +33,22 @@
 		<div class="easyui-panel" data-options="fit:true">
 			<div id="eq_tb">
 				<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick='addrow($("#dg-equations"))'>Add</a>
-				<a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick='deleterow($("#dg-equations"),analysis)'>Delete</a>
+				<a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick='deleterow($("#dg-equations"),analysis,"equations")'>Delete</a>
 			</div>
 			<table id="dg-equations" toolbar="#eq_tb"></table>
 		</div>
 	</div>	
-			
+
+	<div id="win-dg-ranges" class="easyui-window" closed="true" style="width:600px;height:400px" title="Ranges">
+		<div class="easyui-panel" data-options="fit:true">
+			<div id="ra_tb">
+				<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick='addrow($("#dg-ranges"))'>Add</a>
+				<a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick='deleterow($("#dg-ranges"),analysis,"ranges")'>Delete</a>
+			</div>
+			<table id="dg-ranges" toolbar="#ra_tb"></table>
+		</div>
+	</div>	
+	
 	<script type="text/template" id="outputstats_template">
 		<%-variable%> of <%- scen %>: $<% print((scen_value).toFixed(2)) %><br/>
 		<%-variable%> of <%- baseline %>: $<% print((baseline_value).toFixed(2)) %><br/>
@@ -52,6 +62,7 @@
 	<script type="text/javascript">
 		var analysis = new Analysis();
 		var dgEquations = new DGEquations({ model: analysis, el: $("#dg-equations") });
+		var dgRanges = new DGRanges({ model: analysis, el: $("#dg-ranges") });
 		var npvText = new OutputStats({ model: analysis, el: $("#explain"), variable:'NPV' });
 		ocpu.seturl("/breakdown/R")
 		//ocpu.seturl("http://josephguillaume.ocpu.io/breakdown/R")
