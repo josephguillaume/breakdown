@@ -1,13 +1,14 @@
 ## Create a function that returns the value of a variable given a set of arguments
 ## equations is a named character vector (or list)
 ## var is one of the variable names
-evalTermsFun <- function(equations,var){
+evalTermsFun <- function(equations,var,subset.args=TRUE){
   if(is.list(equations)) equations=as.character(equations)
+  ## Run for each column separately
   if(is.matrix(equations)){
     fs=lapply(2:ncol(equations),function(i) {
       eqs=equations[,i]
       names(eqs)=equations[,1]
-      evalTermsFun(eqs,var)
+      evalTermsFun(eqs,var,subset.args)
     })
     if(length(fs)==1) return(fs[[1]])
     return(fs)
@@ -22,7 +23,7 @@ evalTermsFun <- function(equations,var){
     ))
   }
   ## Only equations necessary to calculate var
-  equations <- getSubset(equations,var)
+  if(subset.args) equations <- getSubset(equations,var)
   equations <- equations[equations!=""]
   ## Get ordered expressions, removing later duplicates
   code <- getParse(equations)
