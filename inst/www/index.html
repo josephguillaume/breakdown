@@ -25,7 +25,6 @@
 	<a href="javascript:void(0)" class="easyui-linkbutton" onclick="$('#win-dg-equations').window('open');">Equations</a>
 	<a href="javascript:void(0)" class="easyui-linkbutton" onclick="$('#win-dg-ranges').window('open');">Set ranges</a>
 	<a href="javascript:void(0)" class="easyui-linkbutton" onclick="run_univariate()">Single variable breakeven</a>
-	<a href="javascript:void(0)" class="easyui-linkbutton" onclick="plot_univariate()">Single variable plot</a>
 	<a href="javascript:void(0)" class="easyui-linkbutton" onclick="run_equiconcern()">Many variable breakeven</a>
 	<a href="javascript:void(0)" class="easyui-linkbutton" onclick='$("#win-tree").window("open")'>Tree</a>
 	
@@ -56,7 +55,9 @@
 	</script>
 
 	<div id="explain"></div>
-			
+
+	<div id="singleplot" class="easyui-resizable" data-options="maxWidth:2048,maxHeight:1536" style="border: 1px solid rgb(204, 204, 204);width:400px;height:250px"></div>
+
 	<script type="text/javascript" src="model.js"></script>
 	<script type="text/javascript" src="treemodel.js"></script>
 	<script type="text/javascript">
@@ -64,6 +65,7 @@
 		var dgEquations = new DGEquations({ model: analysis, el: $("#dg-equations") });
 		var dgRanges = new DGRanges({ model: analysis, el: $("#dg-ranges") });
 		var npvText = new OutputStats({ model: analysis, el: $("#explain"), variable:'NPV' });
+		var singleOutputPlot = new SingleOutputPlot({model:analysis, el:$("#singleplot"),output:'NPV'});
 		ocpu.seturl("/breakdown/R")
 		//ocpu.seturl("http://josephguillaume.ocpu.io/breakdown/R")
 	</script>

@@ -45,6 +45,26 @@ var Analysis = Backbone.Model.extend({
 		if(variable==this.selected_var1) this.set("selected_var1",null);
 		return this;
 	},
+	selectEqns:function(indices){
+		var eqns=this.get('equations').map(function(x){
+			// For each row
+			return($.grep(x,function(e,i){
+				// Return name and elements with desired indices
+				return(i==0 || $.inArray(i,indices)>-1);
+			}))
+		});
+		return(eqns);
+	},
+	getRanges:function(vars){
+		if(!vars) return(null);
+		if(!$.isArray(vars)) var vars=[vars];
+		var ranges=this.get('ranges').slice(0);
+		ranges=$.grep(ranges,function(e,i){
+				// Return appropriate elements
+				return($.inArray(e[0],vars)>-1);
+			})
+		return(ranges);
+	},
 	evaluate:function(column,variable){
 		if(this.get('equations').length==0) return(this)
 		dict={};
@@ -251,7 +271,6 @@ var DGRanges = Backbone.View.extend({
 						if(e.keyCode==27){dg.datagrid('cancelEdit', index);return false;}
 					});
 				}
-				console.log(ed);
 			},
 			onAfterEdit: function(index,rowData,changes){
 				console.log('DGRanges onAfterEdit');
@@ -272,6 +291,45 @@ var DGRanges = Backbone.View.extend({
 
 });
 
+var SingleOutputPlot = Backbone.View.extend({
+	initialize: function(args){
+		this.output=args.output;
+		this.model.on('change:ranges', this.render, this);
+		this.model.on('change:equations', this.render, this);
+		this.model.on('change:selected_var1',this.render,this);
+		this.model.on('change:scens',this.render,this);
+		var obj=this;
+		this.$el.resizable({onStopResize:function(){obj.render()}});
+	},
+	render:function(){
+		console.log("render SingleOutputPlot");
+		var model=this.model;
+		if(!model || !model.get("selected_var1")) return(this);
+		var ranges0=model.getRanges(model.get("selected_var1"));
+		//TODO: check if all limits are defined
+		if(ranges0.length==0){
+			$.messager.show({
+			title:'Error',
+			msg:"Range not found for variable "+model.get("selected_var1"),
+			timeout:5000,
+			showType:'slide'
+			});
+			return(this);
+		}
+		var ranges0={Min:ranges0[0][2],Max:ranges0[0][3]}
+		if(!ranges0.Min) return(this)
+		if(!ranges0.Max) return(this)
+		this.$el.rplot("plotNPV",{					
+					equations:model.selectEqns(model.get('scens')),
+					x:model.get("selected_var1"),y:this.output,
+					ranges0:ranges0,
+					scens:$.grep(model.get('header'),function(e,i){
+						return($.inArray(i,model.get("scens"))>-1);
+					})
+				})
+		return this;
+	}
+});
 
 var OutputStats = Backbone.View.extend({
     initialize: function(args){
