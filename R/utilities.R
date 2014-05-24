@@ -14,7 +14,7 @@ getTop <- function(equations,...) {
 
 ## Variables that do not reference any other variables
 getBottom <- function(equations) {
-  if(is.list(equations)) return(names(equations)[sapply(equations,function(x) length(getTerms(x))==0)])
+  if(is.list(equations)||is.character(equations)) return(names(equations)[sapply(equations,function(x) length(getTerms(x))==0)])
 }
 
 ## get expressions necessary for evaluating the equation for var
@@ -24,8 +24,8 @@ getBottom <- function(equations) {
 getSubset <- function(equations,var){
   if(is.matrix(equations)){
     if(!var %in% equations[,1]) return(NULL)
-    row=equations[var,,drop=FALSE]
-    children <- getTerms(row[-1])
+    row=equations[equations[,1]==var,,drop=FALSE]
+    children <- getTerms(row[-1],functions=TRUE)
     return(unique(do.call(rbind,c(
       list(row),
       lapply(children,function(x) getSubset(equations,x))

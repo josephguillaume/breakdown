@@ -5,7 +5,10 @@
 ## scens - vector of scenario names to use in plot
 ## NPV - function to evaluate
 plotNPV<-function(equations,x,y,ranges0,scens){
-  fs=evalTermsFun(equations,y)
+  equations <- getSubset(equations,y)
+  fs=evalTermsFun(equations,y,subset.args=FALSE)
+  ## Use a list even for a single function
+  if(is.function(fs)) fs=list(fs)
   ## Template of the ggplot command
   tpl="
   ggplot(data=data.frame(x=c({MIN},{MAX})))+
