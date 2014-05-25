@@ -356,7 +356,7 @@ var SingleOutputPlot = Backbone.View.extend({
 			});
 			return(this);
 		}
-		var ranges0={Min:ranges0[0][2],Max:ranges0[0][4]}
+		ranges=_.object(this.get("ranges_cols"),ranges0[0]);
 		if(!ranges0.Min) return(this)
 		if(!ranges0.Max) return(this)
 		this.$el.rplot("plotNPV",{					
