@@ -455,7 +455,17 @@ setDefault=function(model){
 	var req=ocpu.rpc("getBottom",{equations:model.get("equations")},function(data){ 
 		var ranges=model.get('ranges').map(function(arr){return arr.slice();});
 		var current_names=ranges.map(function(x){return x[0]});
-		var new_items = _.filter(data,function(v){return !_.contains(current_names,v)}).map(function(v){return [v]});
+		var new_names = _.filter(data,function(v){return !_.contains(current_names,v)})
+		var new_items=new_names.map(function(v){return [v]});
+		var eqns=model.get('equations');
+		$.each(eqns,function(i,v){
+			w=new_names.indexOf(v[0]);
+			if(w > -1 && !isNaN(parseFloat(v[1]))){
+				new_items[w][3]=v[1]
+				new_items[w][1]=v[1]*0.01
+				new_items[w][5]=v[1]*10
+			}
+		});
 		ranges=ranges.concat(new_items);
 		model.set('ranges',ranges);
 	});
