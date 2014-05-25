@@ -9,6 +9,7 @@ plotNPV<-function(equations,x,y,ranges0,scens){
   fs=evalTermsFun(equations,y,subset.args=FALSE)
   ## Use a list even for a single function
   if(is.function(fs)) fs=list(fs)
+  if(is.null(ranges0[["Best"]])) ranges0[["Best"]]=formals(fs[[1]])[[x]]
   if(is.null(ranges0[["Lower"]])) ranges0[["Lower"]]=ranges0[["Min"]]
   if(is.null(ranges0[["Upper"]])) ranges0[["Upper"]]=ranges0[["Max"]]
   ## Template of the ggplot command
@@ -27,7 +28,7 @@ plotNPV<-function(equations,x,y,ranges0,scens){
   limits=c('Best guess','Limits',{SCENS}))"
   ## Replace values
   ## TODO: should throw error if doesn't have same value for each function
-  tpl=gsub("{MODELED}",formals(fs[[1]])[[x]],tpl,fixed=TRUE)
+  tpl=gsub("{MODELED}",ranges0[["Best"]],tpl,fixed=TRUE)
   tpl=gsub("{LOWER}",ranges0[["Lower"]],tpl,fixed=TRUE)
   tpl=gsub("{UPPER}",ranges0[["Upper"]],tpl,fixed=TRUE)
   tpl=gsub("{MIN}",ranges0[["Min"]],tpl,fixed=TRUE)
