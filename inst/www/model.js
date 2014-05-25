@@ -25,8 +25,10 @@ var Analysis = Backbone.Model.extend({
 		equations: [],
 		header:[],
 		ranges:[],
+		univariate_crossover:[],
 		scens:[1,2],
-		selected_var1: null
+		selected_var1: null,
+		ranges_cols:["Variable","Lower","Min","Best","Max","Upper"]
 	},
 	EquationsfromCSV:function(csv){
 		console.log("EquationsfromCSV");
@@ -65,6 +67,16 @@ var Analysis = Backbone.Model.extend({
 			})
 		return(ranges);
 	},
+	normalise:function(x,variable){
+		val=parseFloat(x);
+		ranges=_.object(this.get("ranges_cols"),this.getRanges(variable)[0]);
+		if(!ranges.Best) return(NaN)
+		if(!ranges.Min) return(NaN)
+		if(!ranges.Max) return(NaN)
+		if(Math.abs(x-ranges.Best) < 1e-5){return(0)}
+		if(x>ranges.Best){return (x-ranges.Best)/(ranges.Max-ranges.Best)}
+		if(x>ranges.Best){return (ranges.Best-x)/(ranges.Best-ranges.Min)}
+	},
 	evaluate:function(column,variable){
 		if(this.get('equations').length==0) return(this)
 		dict={};
@@ -92,9 +104,38 @@ var Analysis = Backbone.Model.extend({
 			model.set(variable,vals);
 		});
 		return this;
+	},
+	univariateCrossover:function(output){
+		var model=this;
+		if(model.get('ranges').length==0) return(this);
+		var ranges= {
+			Variable:model.get('ranges').map(function(x){return x[0]}),
+			Lower:model.get('ranges').map(function(x){return parseFloat(x[1])}),
+			Upper:model.get('ranges').map(function(x){return parseFloat(x[5])})
+		};
+		// Check that all are valid bounds
+		if(_.any(ranges.Lower,function(num){ return isNaN(num) })) return(this)
+		if(_.any(ranges.Upper,function(num){ return isNaN(num) })) return(this)
+		
+		var req=ocpu.rpc("univariateCrossover",{
+				'equations.scen':model.selectEqns([model.get('scens')[0]]),
+				'equations.baseline':model.selectEqns([model.get('scens')[1]]),
+				'var':output,
+				ranges:ranges
+			},function(data){
+				//TODO: cannot store results for more than one output
+				model.set('univariate_crossover',data);
+			})
+		req.fail(function(){
+			$.messager.show({
+					title:'Error',
+					msg:req.responseText,
+					timeout:5000,
+					showType:'slide'
+					});
+			model.set('univariate_crossover',[]);
+		});
 	}
-	//univariate
-	//univariate plots
 	//bivariate
 	//equiconcern
 	//staged SCE
@@ -128,7 +169,7 @@ function deleterow(dg,model,dgname){
 	$.messager.confirm('Confirm','Are you sure?',function(r){
 		if (r){
 			//dg.datagrid('deleteRow',dg.getRowIndex(selected)); //whole datagrid will be reset anyway
-			model.delVar(selected.name,dgname);
+			model.delVar(selected.Variable,dgname);
 		}
 	});
 }
@@ -155,21 +196,21 @@ var DGEquations = Backbone.View.extend({
 		var model=this.model;
 		var scens=model.get("scens");
 		var data=model.get("equations");
-		data=data.map(function(x){return({name:x[0],scen1:x[scens[0]],scen2:x[scens[1]]});});
+		data=data.map(function(x){return({Variable:x[0],scen1:x[scens[0]],scen2:x[scens[1]]});});
 		this.$el.datagrid({
 			data: data,
-			idField:'name',
+			idField:'Variable',
 			columns:[[
 			//TODO: sortable:true
-			{field:'name',title:model.get('header')[0],width:220,editor:'text'},
+			{field:'Variable',title:model.get('header')[0],width:220,editor:'text'},
 			{field:'scen1',title:model.get('header')[scens[0]],width:300,editor:'text'},
 			{field:'scen2',title:model.get('header')[scens[1]],width:300,editor:'text'}
 			]],
 			singleSelect:true,
 			fit:true,
 			onSelect: function(index,rowData){
-				console.log("equations selected "+rowData.name);
-				model.set("selected_var1",rowData.name);
+				console.log("equations selected "+rowData.Variable);
+				model.set("selected_var1",rowData.Variable);
 			},
 			onDblClickCell: function(index,field,value){
 				var dg=$(this);
@@ -192,7 +233,7 @@ var DGEquations = Backbone.View.extend({
 									if(changes.scen1) data[index][scens[0]]=changes.scen1;
 									if(changes.scen2) data[index][scens[1]]=changes.scen2;
 									//TODO: allow renaming throughout the matrix	
-									if(changes.name) data[index][0]=changes.name;
+									if(changes.Variable) data[index][0]=changes.Variable;
 									model.set('equations',data);
                                 },
 			checkOnSelect:false,
@@ -219,14 +260,14 @@ var DGRanges = Backbone.View.extend({
 		var model=this.model;
 		var scens=model.get("scens");
 		var data=model.get("ranges");
-		//TODO: show modeled value automatically updated
-		data=data.map(function(x){return({name:x[0],Lower:x[1],Min:x[2],Max:x[3],Upper:x[4]});});
+		//TODO: show calculated modeled value as default Best
+		data=data.map(function(x){return({Variable:x[0],Lower:x[1],Min:x[2],Best:x[3],Max:x[4],Upper:x[5]});});
 		this.$el.datagrid({
 			data: data,
-			idField:'name',
+			idField:'Variable',
 			columns:[[
 			//TODO: sortable:true
-			{field:'name',title:model.get('header')[0],width:220,
+			{field:'Variable',title:model.get('header')[0],width:220,
 				editor:{
 					type:'combobox',
 					options:{
@@ -239,14 +280,15 @@ var DGRanges = Backbone.View.extend({
 			},
 			{field:'Lower',title:"Analysis min",width:100,editor:'text'},
 			{field:'Min',title:"Min",width:100,editor:'text'},
+			{field:'Best',title:"Best guess",width:100,editor:'text'},
 			{field:'Max',title:"Max",width:100,editor:'text'},
 			{field:'Upper',title:"Analysis max",width:100,editor:'text'}
 			]],
 			singleSelect:true,
 			fit:true,
 			onSelect: function(index,rowData){
-				console.log("range selected "+rowData.name);
-				model.set("selected_var1",rowData.name);
+				console.log("range selected "+rowData.Variable);
+				model.set("selected_var1",rowData.Variable);
 			},
 			onDblClickCell: function(index,field,value){
 				var dg=$(this);
@@ -316,7 +358,7 @@ var SingleOutputPlot = Backbone.View.extend({
 			});
 			return(this);
 		}
-		var ranges0={Min:ranges0[0][2],Max:ranges0[0][3]}
+		var ranges0={Min:ranges0[0][2],Max:ranges0[0][4]}
 		if(!ranges0.Min) return(this)
 		if(!ranges0.Max) return(this)
 		this.$el.rplot("plotNPV",{					
@@ -366,4 +408,42 @@ var OutputStats = Backbone.View.extend({
 	}
 });
 
-
+var UnivariateTable = Backbone.View.extend({
+    initialize: function(args,output){
+		this.output=args.output;
+		this.model.on('change:ranges', this.calc, this);
+		this.model.on('change:equations', this.calc, this);
+		this.model.on('change:selected_var1',this.calc,this);
+		this.model.on('change:scens',this.calc,this);
+		this.model.on('change:univariate_crossover', this.render, this);
+		this.model.on('change:ranges', this.render, this);
+		this.render();
+	},
+	calc:function(){
+		this.model.univariateCrossover(this.output);
+		return this;
+	},
+    render: function() {
+		console.log("render UnivariateTable "+this.output);
+		var model=this.model;
+		data=model.get('univariate_crossover');
+		// Calculate data
+		var tab=$.map(model.get('ranges'),function(e,i){
+			var perc_to_limit=model.normalise(data[i],e[0]);
+			var best = model.get('ranges')[i][3];
+			var perc_change=null;
+			if(best && data[i]) perc_change=(data[i]-best)/best*100;
+			var concernClass=null;
+			if(1-perc_to_limit>0.75){ concernClass="highconcern"
+			} else if(1-perc_to_limit>0.25){concernClass="midconcern"
+			} else { concernClass="lowconcern"}
+			var row=e.concat(data[i],perc_to_limit,perc_change,concernClass);
+			return _.object(["Variable","Lower","Min","Best","Max","Upper","Break","PercToLimit","PercChange","concernClass"],row);
+		})
+		// Call template
+		this.$el.html(_.template($("#univTable_template").html(),{
+			tab:tab
+		}));
+		return this;
+	}
+});

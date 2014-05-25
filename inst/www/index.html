@@ -11,6 +11,19 @@
 	<script type="text/javascript" src="js/backbone.1.1.2.min.js"></script>
 	<script type="text/javascript" src="js/jquery.csv-0.71.min.js"></script>
 	<script type="text/javascript" src="js/opencpu-0.5.js"></script>
+	
+	<style>
+	.highconcern {color:red}
+	.midconcern {color:orange}
+	.lowconcern {color:green}
+	#univariate>table>tbody>tr{
+		border-bottom-style: solid;
+		border-bottom-width: 1px;
+		border-bottom-color: grey;
+		text-align:right;
+	}
+	</style>
+
 </head>
 <body>
 
@@ -24,7 +37,6 @@
 			
 	<a href="javascript:void(0)" class="easyui-linkbutton" onclick="$('#win-dg-equations').window('open');">Equations</a>
 	<a href="javascript:void(0)" class="easyui-linkbutton" onclick="$('#win-dg-ranges').window('open');">Set ranges</a>
-	<a href="javascript:void(0)" class="easyui-linkbutton" onclick="run_univariate()">Single variable breakeven</a>
 	<a href="javascript:void(0)" class="easyui-linkbutton" onclick="run_equiconcern()">Many variable breakeven</a>
 	<a href="javascript:void(0)" class="easyui-linkbutton" onclick='$("#win-tree").window("open")'>Tree</a>
 	
@@ -53,11 +65,41 @@
 		<%-variable%> of <%- baseline %>: $<% print((baseline_value).toFixed(2)) %><br/>
 		difference: $<% print((scen_value-baseline_value).toFixed(2)) %>	
 	</script>
+	
+	<script type="text/template" id="univTable_template">
+		<table>
+			<thead>
+			<th>Variable</th>
+			<th>Best guess</th>
+			<th title="% distance from best guess">Level of comfort</th>
+			<th title="% distance from bound">Level of concern</th>
+			<th>Value at crossover point</th>
+			<th>% change of best guess</th>
+			<th>NPV</th>
+			</thead>
+			<tbody>
+			 <% _.each( tab, function( row ){ %>
+				<tr <% if(row.concernClass){ print("class="+row.concernClass)} %>>
+					<td><%- row.Variable%></td>
+					<td><% if(row.Best) print(row.Best)%></td>
+					<td ><% if(row.PercToLimit && !isNaN(parseFloat(row.PercToLimit))){ print((row.PercToLimit*100).toFixed(1)+"%")} %></td>
+					<td><% if(row.PercToLimit && !isNaN(parseFloat(row.PercToLimit))){ print(((1-row.PercToLimit)*100).toFixed(1)+"%")} %></td>
+					<td><% if(row.Break && !isNaN(parseFloat(row.Break))){print(row.Break.toFixed(4))} %></td>
+					<td><% if(row.PercChange && !isNaN(parseFloat(row.PercChange))){print(row.PercChange.toFixed(2)+"%")} %></td>
+					<td><% if(row.NPV){print(row.NPV)} %></td>
+				</tr>
+			  <% }); %>
+			</tbody>
+		</table>
+	</script>
 
 	<div id="explain"></div>
 
 	<div id="singleplot" class="easyui-resizable" data-options="maxWidth:2048,maxHeight:1536" style="border: 1px solid rgb(204, 204, 204);width:400px;height:250px"></div>
 
+	<div id="univariate"></div>
+
+	
 	<script type="text/javascript" src="model.js"></script>
 	<script type="text/javascript" src="treemodel.js"></script>
 	<script type="text/javascript">
@@ -66,6 +108,7 @@
 		var dgRanges = new DGRanges({ model: analysis, el: $("#dg-ranges") });
 		var npvText = new OutputStats({ model: analysis, el: $("#explain"), variable:'NPV' });
 		var singleOutputPlot = new SingleOutputPlot({model:analysis, el:$("#singleplot"),output:'NPV'});
+		var univTable = new UnivariateTable({model:analysis,el:$("#univariate"),output:'NPV'})
 		ocpu.seturl("/breakdown/R")
 		//ocpu.seturl("http://josephguillaume.ocpu.io/breakdown/R")
 	</script>
