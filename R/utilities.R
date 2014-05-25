@@ -6,14 +6,15 @@ getTerms <- function(eq,...) all.vars(parse(text=eq),...)
 ## either named list/vector of equations or matrix with first column names of variables
 ## matrix form identifies variables not referenced in any of the columns
 getTop <- function(equations,...) {
-  if(is.matrix(equations)) return(setdiff(equations[,1],getTerms(equations,...)))
+  if(is.matrix(equations)) return(setdiff(equations[,1],getTerms(equations[,-1],...)))
   if(is.list(equations) || is.character(equations)) 
     return(setdiff(names(equations),getTerms(equations,...)))
   stop("equations not a list or matrix")
 }
 
 ## Variables that do not reference any other variables
-getBottom <- function(equations) {
+getBottom <- function(equations,...) {
+  if(is.matrix(equations)) return(equations[apply(equations[,-1],1,function(x) length(getTerms(x))==0),1])
   if(is.list(equations)||is.character(equations)) return(names(equations)[sapply(equations,function(x) length(getTerms(x))==0)])
 }
 
