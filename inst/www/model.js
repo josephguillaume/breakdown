@@ -113,10 +113,8 @@ var Analysis = Backbone.Model.extend({
 			Lower:model.get('ranges').map(function(x){return parseFloat(x[1])}),
 			Upper:model.get('ranges').map(function(x){return parseFloat(x[5])})
 		};
-		// Check that all are valid bounds
-		if(_.any(ranges.Lower,function(num){ return isNaN(num) })) return(this)
-		if(_.any(ranges.Upper,function(num){ return isNaN(num) })) return(this)
 		
+		console.log("univariateCrossover");
 		var req=ocpu.rpc("univariateCrossover",{
 				'equations.scen':model.selectEqns([model.get('scens')[0]]),
 				'equations.baseline':model.selectEqns([model.get('scens')[1]]),
@@ -189,7 +187,7 @@ var DGEquations = Backbone.View.extend({
     }, 
 	setSelected:function(){
 		var selected=this.model.get('selected_var1');
-		console.log("setSelected on equations "+selected);
+		//console.log("setSelected on equations "+selected);
 		if(selected) this.$el.datagrid('selectRecord',selected);
 	},
     render: function() {
@@ -209,7 +207,7 @@ var DGEquations = Backbone.View.extend({
 			singleSelect:true,
 			fit:true,
 			onSelect: function(index,rowData){
-				console.log("equations selected "+rowData.Variable);
+				//console.log("equations selected "+rowData.Variable);
 				model.set("selected_var1",rowData.Variable);
 			},
 			onDblClickCell: function(index,field,value){
@@ -253,7 +251,7 @@ var DGRanges = Backbone.View.extend({
     }, 
 	setSelected:function(){
 		var selected=this.model.get('selected_var1');
-		console.log("setSelected on ranges "+selected);
+		//console.log("setSelected on ranges "+selected);
 		if(selected) this.$el.datagrid('selectRecord',selected);
 	},
     render: function() {
@@ -287,7 +285,7 @@ var DGRanges = Backbone.View.extend({
 			singleSelect:true,
 			fit:true,
 			onSelect: function(index,rowData){
-				console.log("range selected "+rowData.Variable);
+				//console.log("range selected "+rowData.Variable);
 				model.set("selected_var1",rowData.Variable);
 			},
 			onDblClickCell: function(index,field,value){
@@ -413,7 +411,7 @@ var UnivariateTable = Backbone.View.extend({
 		this.output=args.output;
 		this.model.on('change:ranges', this.calc, this);
 		this.model.on('change:equations', this.calc, this);
-		this.model.on('change:selected_var1',this.calc,this);
+		this.model.on('change:selected_var1',this.setselected,this);
 		this.model.on('change:scens',this.calc,this);
 		this.model.on('change:univariate_crossover', this.render, this);
 		this.model.on('change:ranges', this.render, this);
@@ -422,6 +420,9 @@ var UnivariateTable = Backbone.View.extend({
 	calc:function(){
 		this.model.univariateCrossover(this.output);
 		return this;
+	},
+	setselected:function(){
+		this.$el.find('input[name="selectedVar"][value="' + this.model.get('selected_var1') + '"]').prop('checked', true);
 	},
     render: function() {
 		console.log("render UnivariateTable "+this.output);
@@ -444,6 +445,19 @@ var UnivariateTable = Backbone.View.extend({
 		this.$el.html(_.template($("#univTable_template").html(),{
 			tab:tab
 		}));
+		this.$el.find("input:radio").on('change',function(){model.set('selected_var1',this.value)});
+		this.setselected();
 		return this;
 	}
 });
+
+setDefault=function(model){
+	var req=ocpu.rpc("getBottom",{equations:model.get("equations")},function(data){ 
+		var ranges=model.get('ranges').map(function(arr){return arr.slice();});
+		var current_names=ranges.map(function(x){return x[0]});
+		var new_items = _.filter(data,function(v){return !_.contains(current_names,v)}).map(function(v){return [v]});
+		ranges=ranges.concat(new_items);
+		model.set('ranges',ranges);
+	});
+	req.fail(function(){console.log(req.responseText)});
+}
