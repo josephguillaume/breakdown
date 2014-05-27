@@ -60,6 +60,36 @@
 			</tbody>
 		</table></form>
 	</script>
+	
+	<style>
+	.rbtrow{
+		height:20px;
+		line-height:20px; /* necessary for vertical-align http://stackoverflow.com/questions/9249359/text-vertical-align-in-a-div */
+		vertical-align:middle;
+	}
+	</style>
+	<script type="text/template" id="BivariateRadioButtonTable_template">
+		<div style="position:absolute;width:60%">
+			<div class="rbtrow">Variable</div>
+			<% _.each( ranges, function( row ){ %>
+			<div class="rbtrow"><%print(row[0])%><br/></div>
+			<% }); %>
+		</div>
+		<div style="position:absolute;width:40%;right:0">
+		<div id="<%-inputId%>" style="position:absolute;width:20%">
+			<div class="rbtrow">Var 1</div>
+			<% _.each( ranges, function( row ){ %>
+			<div class="rbtrow"><input type = "radio" name="<%-inputId%>" value=<%print(row[0])%>><br/></div>
+			<% }); %>
+		</div>
+		<div id="<%-inputId2%>" style="position:absolute;width:20%;right:0">
+			<div class="rbtrow">Var 2</div>
+			<% _.each( ranges, function( row ){ %>
+			<div class="rbtrow"><input type = "radio" name="<%-inputId2%>" value=<%print(row[0])%>><br/></div>
+			<% }); %>
+		</div>
+		</div>
+	</script>
 
 	<div data-options="region:'north'" style="height:70px;padding:5px">
 			<h1>Breakdown analysis</h1>
@@ -107,9 +137,23 @@
 			</div>
 		</div></div>
 		
-		<div title="Two variable breakpoints">
-			<div id="biplot" class="easyui-resizable" data-options="maxWidth:2048,maxHeight:1536" style="border: 1px solid rgb(204, 204, 204);width:400px;height:250px"></div>
-		</div>
+		<style>
+		#bi_n + .slider {display:inline-block;margin-left:10px;margin-right:10px}
+		</style>
+		<div title="Two variable breakpoints" style="padding:10px"><div class='easyui-layout' data-options="fit:true">
+			<div data-options="region:'center'" style="padding:10px;" id="biv_table"></div>
+			<div data-options="region:'east',split:true,collapsible:true" style="width:500px;padding:10px">
+				<div id="biplot" class="easyui-resizable" data-options="maxWidth:2048,maxHeight:1536" style="border: 1px solid rgb(204, 204, 204);width:400px;height:250px"></div>
+				<div style="padding:2px;margin-bottom:30px;margin-top:20px">
+					<label for=bi_n>Number of points</label>
+					<input id="bi_n" class="easyui-slider" value="10" style="width:300px" data-options="showTip:true,
+					min:0,max:400,rule:[0,'|',100,'|',200,'|',300,'|',400],
+					onComplete:function(v){biv.set('n',v)}">
+				</div>
+				<label for=biv_flip>Flip axes</label><input type='checkbox' id='biv_flip'>
+			</div>
+		</div></div>
+		
 		<div title="Many-variable breakpoints"></div>
 	</div>
 		
@@ -125,6 +169,8 @@
 		var univTable = new UnivariateTable({model:analysis,el:$("#univariate"),output:'NPV'});
 		var biv=new BivariateAnalysis({base:analysis,output:'NPV'});
 		var bivOutputPlot = new BivOutputPlot({model:biv, el:$("#biplot")});
+		var biRadio = new BivRadioButtonTable({model:biv,el:$("#biv_table")})
+		$("#biv_flip").on('change',function(){biv.set("flip",$(this).is(':checked'))});
 		ocpu.seturl("/breakdown/R")
 		//ocpu.seturl("http://josephguillaume.ocpu.io/breakdown/R")
 	</script>

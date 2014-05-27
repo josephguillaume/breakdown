@@ -500,9 +500,8 @@ var BivariateAnalysis = Backbone.Model.extend({
 		this.listenTo(this.get("base"),'change:scens',this.bivariateCrossover,this);		
 	},
 	bivariateCrossover: function(){
-		console.log(this);
 		if(!this.get("output")) return this;
-		if(this.get("vars").length==0) return this;
+		if(this.get("vars").length!=2) return this;
 		console.log("bivariateCrossover");
 		var base=this.get("base");
 		var biv=this;
@@ -538,6 +537,39 @@ var BivOutputPlot = Backbone.View.extend({
 					flip:this.model.get("flip")
 		})
 		req.fail(function(){console.log(req.responseText)});
+		return this;
+	}
+});
+
+var BivRadioButtonTable = Backbone.View.extend({
+    initialize: function(args){
+		this.listenTo(this.model.get("base"),'change:ranges',this.render,this);
+		this.listenTo(this.model,'change:vars',this.setselected,this);
+		this.inputId=this.$el.prop("id")+"_var1";
+		this.inputId2=this.$el.prop("id")+"_var2"
+	},
+	setselected:function(){
+		$("#"+this.inputId).find('input[name="'+this.inputId+'"][value="' + 
+			this.model.get('vars')[0] + '"]').prop('checked', true);
+		$("#"+this.inputId2).find('input[name="'+this.inputId2+'"][value="' + 
+			this.model.get('vars')[1] + '"]').prop('checked', true);
+	},
+    render: function() {
+		console.log("render BivRadioButtonTable")
+		var model=this.model;
+		var ranges=model.get("base").get('ranges');
+		// Call template
+		this.$el.html(_.template($("#BivariateRadioButtonTable_template").html(),{
+			ranges:ranges,
+			inputId:this.inputId,
+			inputId2:this.inputId2
+		}));
+		//should be listenTo?
+		$("#"+this.inputId).find("input:radio").on('change',function(){
+			model.set('vars',[this.value,model.get('vars')[1]])});
+		$("#"+this.inputId2).find("input:radio").on('change',function(){
+			model.set('vars',[model.get('vars')[0],this.value])});
+		this.setselected();
 		return this;
 	}
 });
