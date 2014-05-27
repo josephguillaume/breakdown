@@ -57,16 +57,25 @@ var Analysis = Backbone.Model.extend({
 		});
 		return(eqns);
 	},
-	getRanges:function(vars){
+	getRanges:function(vars,asArray=true){
 		if(!vars) return(null);
 		if(!$.isArray(vars)) var vars=[vars];
-		var ranges=this.get('ranges').slice(0);
+		var ranges=this.get('ranges').map(function(arr){return arr.slice();});
 		ranges=$.grep(ranges,function(e,i){
 				// Return appropriate elements
 				return($.inArray(e[0],vars)>-1);
 			})
-		return(ranges);
-	},
+		if(asArray){ return(ranges) };
+		ranges = {
+			Variable:ranges.map(function(x){return x[0]}),
+			Lower:ranges.map(function(x){return parseFloat(x[1])}),
+			Min:ranges.map(function(x){return parseFloat(x[2])}),
+			Best:ranges.map(function(x){return parseFloat(x[3])}),
+			Max:ranges.map(function(x){return parseFloat(x[4])}),
+			Upper:ranges.map(function(x){return parseFloat(x[5])}),
+		};
+		return ranges;
+	},	
 	normalise:function(x,variable){
 		val=parseFloat(x);
 		ranges=_.object(this.get("ranges_cols"),this.getRanges(variable)[0]);
@@ -471,3 +480,64 @@ setDefault=function(model){
 	});
 	req.fail(function(){console.log(req.responseText)});
 }
+
+var BivariateAnalysis = Backbone.Model.extend({
+	defaults: {
+		n:10,
+		vars:[],
+		output:null,
+		flip:false,
+		bivariate_result:null,
+		base:null
+	},
+	initialize:function(obj){
+		//bivariateCrossover is called if any of the attributes change
+		this.on('change:n',this.bivariateCrossover,this);
+		this.on('change:vars',this.bivariateCrossover,this);
+		this.on('change:output',this.bivariateCrossover,this);
+		this.listenTo(this.get("base"),'change:ranges', this.bivariateCrossover, this);
+		this.listenTo(this.get("base"),'change:equations', this.bivariateCrossover, this);
+		this.listenTo(this.get("base"),'change:scens',this.bivariateCrossover,this);		
+	},
+	bivariateCrossover: function(){
+		console.log(this);
+		if(!this.get("output")) return this;
+		if(this.get("vars").length==0) return this;
+		console.log("bivariateCrossover");
+		var base=this.get("base");
+		var biv=this;
+		var ranges=base.getRanges(this.get("vars"),false);
+		var req=ocpu.call("bivariateCrossover",{
+				'equations.scen':base.selectEqns([base.get('scens')[0]]),
+				'equations.baseline':base.selectEqns([base.get('scens')[1]]),
+				'var':this.get("output"),
+				ranges:ranges,
+				n:this.get("n")
+		},function(session){
+			biv.set("bivariate_result",session)
+		})
+	}
+});
+
+var BivOutputPlot = Backbone.View.extend({
+    initialize: function(args){
+		this.listenTo(this.model,'change:bivariate_result', this.render, this);
+		this.listenTo(this.model,'change:flip', this.render, this);
+		//TODO: changing Min,Max,Best should just involve new plot
+		var obj=this;
+		this.$el.resizable({onStopResize:function(){obj.render()}});
+	},
+    render: function() {
+		var pom=this.model.get("bivariate_result");
+		if(!pom) return this;
+		console.log("BivOutputPlot render");
+		var ranges=this.model.get("base").getRanges(this.model.get("vars"),false);
+		var req=this.$el.rplot("biplot",{
+					pom:pom,
+					ranges:ranges,
+					flip:this.model.get("flip")
+		})
+		req.fail(function(){console.log(req.responseText)});
+		return this;
+	}
+});

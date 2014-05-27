@@ -107,7 +107,9 @@
 			</div>
 		</div></div>
 		
-		<div title="Two variable breakpoints"></div>
+		<div title="Two variable breakpoints">
+			<div id="biplot" class="easyui-resizable" data-options="maxWidth:2048,maxHeight:1536" style="border: 1px solid rgb(204, 204, 204);width:400px;height:250px"></div>
+		</div>
 		<div title="Many-variable breakpoints"></div>
 	</div>
 		
@@ -120,7 +122,9 @@
 		var dgRanges = new DGRanges({ model: analysis, el: $("#dg-ranges") });
 		var npvText = new OutputStats({ model: analysis, el: $("#explain"), variable:'NPV' });
 		var singleOutputPlot = new SingleOutputPlot({model:analysis, el:$("#singleplot"),output:'NPV'});
-		var univTable = new UnivariateTable({model:analysis,el:$("#univariate"),output:'NPV'})
+		var univTable = new UnivariateTable({model:analysis,el:$("#univariate"),output:'NPV'});
+		var biv=new BivariateAnalysis({base:analysis,output:'NPV'});
+		var bivOutputPlot = new BivOutputPlot({model:biv, el:$("#biplot")});
 		ocpu.seturl("/breakdown/R")
 		//ocpu.seturl("http://josephguillaume.ocpu.io/breakdown/R")
 	</script>
