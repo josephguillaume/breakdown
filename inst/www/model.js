@@ -497,7 +497,7 @@ var BivariateAnalysis = Backbone.Model.extend({
 		bivariate_result:null,
 		base:null
 	},
-	initialize:function(obj){
+	initialize:function(){
 		//bivariateCrossover is called if any of the attributes change
 		this.on('change:n',this.bivariateCrossover,this);
 		this.on('change:vars',this.bivariateCrossover,this);
@@ -658,8 +658,31 @@ var MultivarCrossover = Backbone.Model.extend({
 		multivar_result:null,
 		base:null
 	},
-	initialize:function(obj){
-		//TODO: run analysis on request
+	crossoverEquiconcern: function(){
+		//analysis is to be run on request
+		if(!this.get("output")) return this;
+		console.log("crossoverEquiconcern");
+		var base=this.get("base");
+		var model=this;
+		var ranges=base.getRanges(this.get("vars"),false);
+		var req=ocpu.rpc("crossoverEquiconcern",{
+				'equations.scen':base.selectEqns([base.get('scens')[0]]),
+				'equations.baseline':base.selectEqns([base.get('scens')[1]]),
+				'var':this.get("output"),
+				ranges:ranges
+		},function(result){
+			model.set("multivar_result",result)
+		});
+		req.fail(function(){
+			$.messager.show({
+					title:'Error',
+					msg:req.responseText,
+					timeout:5000,
+					showType:'slide'
+					});
+			model.set("multivar_result",null);
+		});
+		return this;
 	}
 });
 
