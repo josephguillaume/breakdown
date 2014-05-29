@@ -355,7 +355,6 @@ var SingleOutputPlot = Backbone.View.extend({
 		var model=this.model;
 		if(!model || !model.get("selected_var1")) return(this);
 		var ranges0=model.getRanges(model.get("selected_var1"));
-		//TODO: check if all limits are defined
 		if(ranges0.length==0){
 			$.messager.show({
 			title:'Error',
@@ -366,8 +365,6 @@ var SingleOutputPlot = Backbone.View.extend({
 			return(this);
 		}
 		ranges0=_.object(model.get("ranges_cols"),ranges0[0]);
-		if(!ranges0.Min) return(this)
-		if(!ranges0.Max) return(this)
 		this.$el.rplot("plotNPV",{					
 					equations:model.selectEqns(model.get('scens')),
 					x:model.get("selected_var1"),y:this.output,

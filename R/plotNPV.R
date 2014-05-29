@@ -10,13 +10,10 @@ plotNPV<-function(equations,x,y,ranges0,scens){
   ## Use a list even for a single function
   if(is.function(fs)) fs=list(fs)
   if(is.null(ranges0[["Best"]])) ranges0[["Best"]]=formals(fs[[1]])[[x]]
-  if(is.null(ranges0[["Lower"]])) ranges0[["Lower"]]=ranges0[["Min"]]
-  if(is.null(ranges0[["Upper"]])) ranges0[["Upper"]]=ranges0[["Max"]]
   ## Template of the ggplot command
   tpl="
-  ggplot(data=data.frame(x=c({MIN},{MAX})))+
+  ggplot()+
   geom_vline(aes(xintercept={MODELED},linetype='Best guess',size='Best guess',colour='Best guess',show_guide=TRUE))+
-  geom_vline(aes(xintercept=c({MIN},{MAX}),linetype='Limits',size='Limits',colour='Limits'))+
   geom_hline(aes(yintercept=0),colour='grey',size=1,linetype='solid')+
   scale_x_continuous(name=x,limits=range(c({LOWER},{UPPER})))+
   scale_y_continuous(name='NPV')+
@@ -31,8 +28,11 @@ plotNPV<-function(equations,x,y,ranges0,scens){
   tpl=gsub("{MODELED}",ranges0[["Best"]],tpl,fixed=TRUE)
   tpl=gsub("{LOWER}",ranges0[["Lower"]],tpl,fixed=TRUE)
   tpl=gsub("{UPPER}",ranges0[["Upper"]],tpl,fixed=TRUE)
-  tpl=gsub("{MIN}",ranges0[["Min"]],tpl,fixed=TRUE)
-  tpl=gsub("{MAX}",ranges0[["Max"]],tpl,fixed=TRUE)
+  if(!is.null(ranges0[["Min"]]) && !is.null(ranges0[["Max"]])){
+    tpl=paste(tpl,"+geom_vline(aes(xintercept=c({MIN},{MAX}),linetype='Limits',size='Limits',colour='Limits'))")
+    tpl=gsub("{MIN}",ranges0[["Min"]],tpl,fixed=TRUE)
+    tpl=gsub("{MAX}",ranges0[["Max"]],tpl,fixed=TRUE)
+  }
   tpl=gsub("{LINETYPE}",paste(sprintf("'%s'='solid'",scens),collapse=","),tpl,fixed=TRUE)
   tpl=gsub("{SIZE}",paste(sprintf("'%s'=1",scens),collapse=","),tpl,fixed=TRUE)
   tpl=gsub("{COLOUR}",paste(sprintf("'%s'='%s'",scens,scales::hue_pal()(length(scens))),collapse=","),tpl,fixed=TRUE)
