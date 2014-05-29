@@ -573,3 +573,65 @@ var BivRadioButtonTable = Backbone.View.extend({
 		return this;
 	}
 });
+
+
+var editRange_placeholder=function(this_var){
+	//TODO
+	$('#win').html(analysis.getRanges(this_var));
+	$('#win').window('open');
+}
+			
+			
+// Creates a complete set of sliders - can't change each variable separately anyway in model,
+//  so not worth having individual sliders
+var RangeSliders = Backbone.View.extend({
+    initialize: function(args){
+		this.editRange=args.editRange;
+		this.listenTo(this.model,'change:ranges',this.render,this);
+		//this.render();
+	},
+    render: function(){
+		// TODO: avoid redrawing if only min and max change
+		console.log('RangeSliders render '+this.$el.prop("id"));
+		var model=this.model;
+		var editRange=this.editRange;
+		var prefix=this.$el.prop("id")+"_";
+		//If there are existing sliders, remove them
+		//https://github.com/egorkhmelev/jslider/issues/39
+		this.$el.find("input[type='slider']").off();
+		this.$el.find("input[type='slider']").removeData("jslider");
+		this.$el.find("input[type='slider']+.jslider").remove();
+		// Create sliders
+		this.$el.find("input[type='slider']").each(function(){
+			var id=$(this).prop('id').replace(prefix,"");
+			//var range=console.log($(this).data('range'));
+			var range=model.getRanges(id,asArray=false); //object is a copy
+			if(isNaN(range.Min)) range.Min=range.Lower;
+			if(isNaN(range.Max)) range.Max=range.Upper;
+			//Define scale
+			var scale=[];
+			for (var i = 0; i <= 15+1; i++) {scale.push("|");};
+			scale[Math.round((range.Best[0]-range.Lower[0])/(range.Upper[0]-range.Lower[0])*15.0)+1]=range.Best;
+			
+			$(this).slider({ range:true, from: range.Lower[0], to: range.Upper[0], step: (range.Upper[0]-range.Lower[0])/250, round: false, 
+				scale:scale,format: { format: "#,##0.#####", locale: 'us' }, dimension:'', skin: "round",
+				callback:function(value){
+					//Edit model's ranges and reset it
+					var data=model.get('ranges').map(function(arr){return arr.slice();});
+					index=data.map(function(x){return x[0]}).indexOf(id);
+					var vals = value.split(/;/, 2);
+					data[index][model.get("ranges_cols").indexOf("Min")]=vals[0];
+					data[index][model.get("ranges_cols").indexOf("Max")]=vals[1];
+					model.set('ranges',data);
+				}
+			})
+			$(this).slider("value",range.Min[0],range.Max[0]);
+			$(this).next(".jslider").find(".jslider-value-to").on('click',function(){editRange(id)});
+			$(this).next(".jslider").find(".jslider-value").on('click',function(){editRange(id)});
+			$(this).next(".jslider").find(".jslider-label-to").on('click',function(){editRange(id)});
+			$(this).next(".jslider").find(".jslider-label").on('click',function(){editRange(id)});
+			$(this).next(".jslider").find(".jslider-scale span:not(:empty())").on('click',function(){editRange(id)});
+		})
+		return this;
+	}
+});
