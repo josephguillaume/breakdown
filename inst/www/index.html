@@ -104,6 +104,36 @@
 			</tbody>
 		</table>
 	</script>
+	
+	<script type="text/template" id="MultiVarResultsTable_template">
+		<table>
+			<thead>
+				<th>Variable</th>
+				<th>Min</th>
+				<th>Max</th>
+				<th>Single variable<br/>breakpoint</th>
+				<th>Best guess</th>
+				<th>Many variable<br/>breakpoint</th>
+				<th>Change</th>
+				<th title="% distance from bound">Level of concern</th>
+			</thead>
+			<tbody>
+				<% _.each( results, function( row ){ %>
+				<tr>
+					<td><%-row.Variable%></td>
+					<!-- TODO: neater robust number formatting -->
+					<td align='right'><% if(!isNaN(parseFloat(row.Min))){ print(parseFloat(row.Min).toFixed(2))}%></td>
+					<td align='right'><% if(!isNaN(parseFloat(row.Max))){ print(parseFloat(row.Max).toFixed(2))}%></td>
+					<td align='right'><% if(!isNaN(parseFloat(row.univar))){ print(parseFloat(row.univar).toFixed(2))}%></td>
+					<td align='right'><% if(!isNaN(parseFloat(row.Best))){ print(parseFloat(row.Best).toFixed(2))}%></td>
+					<td align='right'><% if(!isNaN(parseFloat(row.multvar))){ print(parseFloat(row.multvar).toFixed(2))}%></td>
+					<td align='right'><% if(!isNaN(parseFloat(row.change))){ print(parseFloat(row.change).toFixed(2))}%></td>
+					<td align='right'><% if(!isNaN(parseFloat(loc))){ print(parseFloat(loc).toFixed(2))}%></td>
+				</tr>
+				<% }); %>
+			</tbody>
+		</table>
+	</script>
 
 	<div data-options="region:'north'" style="height:70px;padding:5px">
 			<h1>Breakdown analysis</h1>
@@ -168,7 +198,10 @@
 		
 		<div title="Many-variable breakpoints"><div class='easyui-layout' data-options="fit:true">
 			<div data-options="region:'center'" style="padding:10px;" id="mult_table"></div>
-			<div data-options="region:'east',split:true,collapsible:true" style="width:500px;padding:10px"></div>
+			<div data-options="region:'east',split:true,collapsible:true" style="width:500px;padding:10px">
+				<a href="#" class="easyui-linkbutton" onclick='mult.crossoverEquiconcern()'>Update many-variable breakpoints</a><br/>
+				<div id='mult_output'></div>
+			</div>
 		</div></div>
 	</div>
 	
@@ -194,6 +227,7 @@
 					});
 		var mult= new MultivarCrossover({base:analysis,output:'NPV'});
 		var multCheck = new MultivarCheckboxTable({model:mult,el:$("#mult_table"),template:$("#MultiVarRB_template")});
+		var multOut= new MultivarResultsTable({model:mult,el:$("#mult_output"),template:$("#MultiVarResultsTable_template")});
 		ocpu.seturl("/breakdown/R")
 		//ocpu.seturl("http://josephguillaume.ocpu.io/breakdown/R")
 	</script>

@@ -686,7 +686,7 @@ var MultivarCrossover = Backbone.Model.extend({
 	}
 });
 
-MultivarCheckboxTable = Backbone.View.extend({
+var MultivarCheckboxTable = Backbone.View.extend({
 	//model is a MultivarCrossover
     initialize: function(args){
 		this.template=_.template(args.template.html());
@@ -725,5 +725,45 @@ MultivarCheckboxTable = Backbone.View.extend({
 		});
 		this.setselected();
 		return this;
+	}
+});
+
+var MultivarResultsTable = Backbone.View.extend({
+	//model is a MultivarCrossover
+    initialize: function(args){
+		this.template=_.template(args.template.html());
+		this.listenTo(this.model.get("base"),'change:univariate_crossover',this.render,this);
+		this.listenTo(this.model,'change:multivar_result',this.render,this);
+	},
+    render: function() {
+		var model=this.model
+		var multvar_result=model.get("multivar_result");
+		if(!multvar_result){
+			this.$el.html("No results to display");
+			return this;
+		}
+		//TODO: more efficient way of subsetting univar
+		var variables=model.get("base").get('ranges').map(function(x){return x[0]});
+		var varIdx=model.get("vars").map(function(v){return variables.indexOf(v)});
+		var univar=model.get("base").get("univariate_crossover");
+		var results={
+			Variable:model.get("vars"),
+			univar:varIdx.map(function(i){return univar[i]}),
+			multvar:multvar_result.values.slice(0)
+		}
+		var ranges=model.get("base").getRanges(model.get("vars"),false);
+		results.Min=ranges.Min;
+		results.Max=ranges.Max;
+		results.Best=ranges.Best;
+		results.change=results.Best.map(function(e,i){return results.multvar[i]-e});
+		var names=Object.keys(results);
+		//Convert from object of arrays to array of objects
+		results=_.zip.apply(_, _.toArray(results)).map(function(x){return _.object(names,x)});
+		console.log(results);
+		
+		this.$el.html(this.template({
+			results:results,
+			loc:model.get("multivar_result").loc
+		}));
 	}
 });
