@@ -41,7 +41,7 @@
 		<form><table>
 			<thead>
 			<th>Variable</th>
-			<th>Best guess</th>
+			<th></th>
 			<th title="% distance from best guess">Level of comfort</th>
 			<th title="% distance from bound">Level of concern</th>
 			<th>Value at crossover point</th>
@@ -50,10 +50,10 @@
 			</thead>
 			<tbody>
 			 <% _.each( tab, function( row ){ %>
-				<tr <% if(row.concernClass){ print("class="+row.concernClass)} %>>
-					<td><%- row.Variable%></td>
-					<td><% if(row.Best) print(row.Best)%></td>
-					<td ><% if(row.PercToLimit && !isNaN(parseFloat(row.PercToLimit))){ print((row.PercToLimit*100).toFixed(1)+"%")} %></td>
+				<tr align="middle" <% if(row.concernClass){ print("class="+row.concernClass)} %>>
+					<td align="right"><%- row.Variable%></td>
+					<td><input id="<%-id%>_<%-row.Variable%>" value="<%-row.Lower%>;<%-row.Upper%>" type="slider"/></td>
+					<td><% if(row.PercToLimit && !isNaN(parseFloat(row.PercToLimit))){ print((row.PercToLimit*100).toFixed(1)+"%")} %></td>
 					<td><% if(row.PercToLimit && !isNaN(parseFloat(row.PercToLimit))){ print(((1-row.PercToLimit)*100).toFixed(1)+"%")} %></td>
 					<td><% if(row.Break && !isNaN(parseFloat(row.Break))){print(row.Break.toFixed(4))} %></td>
 					<td><% if(row.PercChange && !isNaN(parseFloat(row.PercChange))){print(row.PercChange.toFixed(2)+"%")} %></td>
@@ -166,7 +166,6 @@
 		var biv=new BivariateAnalysis({base:analysis,output:'NPV'});
 		var bivOutputPlot = new BivOutputPlot({model:biv, el:$("#biplot")});
 		var biRadio = new BivRadioButtonTable({model:biv,el:$("#biv_table")});
-		var biSliders=new RangeSliders({model:analysis,el:$("#biv_table"),editRange:editRange_placeholder});
 		$("#biv_flip").on('change',function(){biv.set("flip",$(this).is(':checked'))});
 		$("#bi_n").slider({from:0,to:400,scale:[0,'|',100,'|',200,'|',300,'|',400],limits:false,
 					callback:function(v){biv.set('n',parseInt(v))}

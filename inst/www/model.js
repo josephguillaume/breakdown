@@ -418,6 +418,11 @@ var OutputStats = Backbone.View.extend({
 var UnivariateTable = Backbone.View.extend({
     initialize: function(args,output){
 		this.output=args.output;
+		
+		this.uniSliders=new RangeSliders({model:this.model,el:this.$el,editRange:editRange_placeholder});
+		//uniSliders will be updated on render here instead
+		this.uniSliders.stopListening();
+		
 		this.model.on('change:ranges', this.calc, this);
 		this.model.on('change:equations', this.calc, this);
 		this.model.on('change:selected_var1',this.setselected,this);
@@ -452,8 +457,10 @@ var UnivariateTable = Backbone.View.extend({
 		})
 		// Call template
 		this.$el.html(_.template($("#univTable_template").html(),{
-			tab:tab
+			tab:tab,
+			id:this.$el.prop("id")
 		}));
+		this.uniSliders.render();
 		this.$el.find("input:radio").on('change',function(){model.set('selected_var1',this.value)});
 		this.setselected();
 		return this;
@@ -520,6 +527,7 @@ var BivariateAnalysis = Backbone.Model.extend({
 
 var BivOutputPlot = Backbone.View.extend({
     initialize: function(args){
+
 		this.listenTo(this.model,'change:bivariate_result', this.render, this);
 		this.listenTo(this.model,'change:flip', this.render, this);
 		//TODO: changing Min,Max,Best should just involve new plot
@@ -542,11 +550,16 @@ var BivOutputPlot = Backbone.View.extend({
 });
 
 var BivRadioButtonTable = Backbone.View.extend({
+	//model is a BivariateAnalysis
     initialize: function(args){
 		this.listenTo(this.model.get("base"),'change:ranges',this.render,this);
 		this.listenTo(this.model,'change:vars',this.setselected,this);
 		this.inputId=this.$el.prop("id")+"_var1";
-		this.inputId2=this.$el.prop("id")+"_var2"
+		this.inputId2=this.$el.prop("id")+"_var2";
+		
+		this.sliders=new RangeSliders({model:this.model.get("base"),el:this.$el,editRange:editRange_placeholder});
+		//sliders will be updated on render here instead
+		this.sliders.stopListening();
 	},
 	setselected:function(){
 		this.$el.find('input[name="'+this.inputId+'"][value="' + 
@@ -558,7 +571,6 @@ var BivRadioButtonTable = Backbone.View.extend({
 		console.log("render BivRadioButtonTable")
 		var model=this.model;
 		var ranges=model.get("base").get('ranges');
-		console.log(ranges);
 		// Call template
 		this.$el.empty().html(_.template($("#BivariateRadioButtonTable_template").html(),{
 			ranges:ranges,
@@ -566,6 +578,7 @@ var BivRadioButtonTable = Backbone.View.extend({
 			inputId2:this.inputId2,
 			id:this.$el.prop("id")
 		}));
+		this.sliders.render();
 		//should be listenTo?
 		this.$el.find("input:radio[name='"+this.inputId+"']").on('change',function(){
 			model.set('vars',[this.value,model.get('vars')[1]])});
@@ -606,7 +619,6 @@ var RangeSliders = Backbone.View.extend({
 		// Create sliders
 		this.$el.find("input[type='slider']").each(function(){
 			var id=$(this).prop('id').replace(prefix,"");
-			//var range=console.log($(this).data('range'));
 			var range=model.getRanges(id,asArray=false); //object is a copy
 			if(isNaN(range.Min)) range.Min=range.Lower;
 			if(isNaN(range.Max)) range.Max=range.Upper;
