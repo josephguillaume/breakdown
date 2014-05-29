@@ -85,6 +85,25 @@
 			</tbody>
 		</table>
 	</script>
+	
+	<script type="text/template" id="MultiVarRB_template">
+		<table>
+			<thead>
+				<th>Variable</th>
+				<th></th>
+				<th>Vary?</th>
+			</thead>
+			<tbody>
+				<% _.each( ranges, function( row ){ %>
+				<tr valign='middle'>
+					<td style='text-align:right'><%print(row[0])%></td>
+					<td><input id="<%-id%>_<%print(row[0])%>" value="<%print(row[1])%>;<%print(row[5])%>" type="slider"/></td>
+					<td style='text-align:center'><input type = "checkbox" name="<%-inputId%>" value=<%print(row[0])%>></td>
+				</tr>
+				<% }); %>
+			</tbody>
+		</table>
+	</script>
 
 	<div data-options="region:'north'" style="height:70px;padding:5px">
 			<h1>Breakdown analysis</h1>
@@ -147,7 +166,10 @@
 			</div>
 		</div></div>
 		
-		<div title="Many-variable breakpoints"></div>
+		<div title="Many-variable breakpoints"><div class='easyui-layout' data-options="fit:true">
+			<div data-options="region:'center'" style="padding:10px;" id="mult_table"></div>
+			<div data-options="region:'east',split:true,collapsible:true" style="width:500px;padding:10px"></div>
+		</div></div>
 	</div>
 	
     <div id="win" class="easyui-window" title="Edit range" style="width:400px;height:200px"
@@ -170,6 +192,8 @@
 		$("#bi_n").slider({from:0,to:400,scale:[0,'|',100,'|',200,'|',300,'|',400],limits:false,
 					callback:function(v){biv.set('n',parseInt(v))}
 					});
+		var mult= new MultivarCrossover({base:analysis,output:'NPV'});
+		var multCheck = new MultivarCheckboxTable({model:mult,el:$("#mult_table"),template:$("#MultiVarRB_template")});
 		ocpu.seturl("/breakdown/R")
 		//ocpu.seturl("http://josephguillaume.ocpu.io/breakdown/R")
 	</script>

@@ -649,3 +649,58 @@ var RangeSliders = Backbone.View.extend({
 		return this;
 	}
 });
+
+
+var MultivarCrossover = Backbone.Model.extend({
+	defaults: {
+		vars:[],
+		output:null,
+		multivar_result:null,
+		base:null
+	},
+	initialize:function(obj){
+		//TODO: run analysis on request
+	}
+});
+
+MultivarCheckboxTable = Backbone.View.extend({
+	//model is a MultivarCrossover
+    initialize: function(args){
+		this.template=_.template(args.template.html());
+		this.listenTo(this.model.get("base"),'change:ranges',this.render,this);
+		this.listenTo(this.model,'change:vars',this.setselected,this);
+		this.inputId=this.$el.prop("id")+"_var";
+		
+		this.sliders=new RangeSliders({model:this.model.get("base"),el:this.$el,editRange:editRange_placeholder});
+		//sliders will be updated on render here instead
+		this.sliders.stopListening();
+	},
+	setselected:function(){
+		var view=this;
+		view.$el.find('input[name="'+this.inputId+'"]').prop('checked',false);
+	    _.each(view.model.get('vars'),function(val,i,l){
+			view.$el.find('input[name="'+view.inputId+'"][value="' + val + '"]').prop('checked', true);
+		});
+	},
+    render: function() {
+		console.log("render MultivarCheckboxTable")
+		var model=this.model;
+		var jq=this.$el;
+		var ranges=model.get("base").get('ranges');
+		// Call template
+		jq.html(this.template({
+			ranges:ranges,
+			inputId:this.inputId,
+			id:this.$el.prop("id")
+		}));
+		this.sliders.render();
+		//should be listenTo?
+		jq.find("input:checkbox[name='"+this.inputId+"']").on('change',function(){
+			var checked=[];
+			jq.find("input:checked").each(function(){checked.push(this.value)});
+			model.set('vars',checked)
+		});
+		this.setselected();
+		return this;
+	}
+});
