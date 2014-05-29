@@ -9,6 +9,7 @@
 	<script type="text/javascript" src="js/jquery.min.js"></script>
 	<script type="text/javascript" src="js/jquery.easyui.min.js"></script>
 	<script type="text/javascript" src="js/jquery.slider.min.js"></script>
+	<!-- note all sliders are http://egorkhmelev.github.io/jslider/ not jeasyui -->
 	<script type="text/javascript" src="js/underscore.1.6.0.min.js"></script>
 	<script type="text/javascript" src="js/backbone.1.1.2.min.js"></script>
 	<script type="text/javascript" src="js/jquery.csv-0.71.min.js"></script>
@@ -140,9 +141,7 @@
 				<div id="biplot" class="easyui-resizable" data-options="maxWidth:2048,maxHeight:1536" style="border: 1px solid rgb(204, 204, 204);width:400px;height:250px"></div>
 				<div style="padding:2px;margin-bottom:30px;margin-top:20px">
 					<label for=bi_n>Number of points</label>
-					<input id="bi_n" class="easyui-slider" value="10" style="width:300px" data-options="showTip:true,
-					min:0,max:400,rule:[0,'|',100,'|',200,'|',300,'|',400],
-					onComplete:function(v){biv.set('n',v)}">
+					<input id="bi_n" type="slider" value="10" style="width:300px">
 				</div>
 				<label for=biv_flip>Flip axes</label><input type='checkbox' id='biv_flip'>
 			</div>
@@ -169,6 +168,9 @@
 		var biRadio = new BivRadioButtonTable({model:biv,el:$("#biv_table")});
 		var biSliders=new RangeSliders({model:analysis,el:$("#biv_table"),editRange:editRange_placeholder});
 		$("#biv_flip").on('change',function(){biv.set("flip",$(this).is(':checked'))});
+		$("#bi_n").slider({from:0,to:400,scale:[0,'|',100,'|',200,'|',300,'|',400],limits:false,
+					callback:function(v){biv.set('n',parseInt(v))}
+					});
 		ocpu.seturl("/breakdown/R")
 		//ocpu.seturl("http://josephguillaume.ocpu.io/breakdown/R")
 	</script>
