@@ -1,4 +1,4 @@
-crossoverEquiconcern=function(equations.scen, equations.baseline, var, ranges){
+crossoverEquiconcern=function(equations.scen, equations.baseline, var, ranges,bounds="combn"){
   ranges=as.data.frame(ranges)
   stopifnot(all(c("Variable","Lower","Min","Best","Max","Upper") %in% names(ranges)))
   
@@ -15,8 +15,13 @@ crossoverEquiconcern=function(equations.scen, equations.baseline, var, ranges){
     netdiff(x)
   }
   ## All possible directions
-  bounds<-do.call(expand.grid,lapply(apply(ranges[,c("Min","Max")],1,as.list),unlist))
-  ## Identify crossover point along eacg line of equal concern
+  if(identical(bounds,"combn")) bounds<-do.call(expand.grid,lapply(apply(ranges[,c("Min","Max")],1,as.list),unlist))
+  if(identical(bounds,"opt")) {
+    cc=cor_kendall(f.scen=f.scen,f.baseline=f.baseline,ranges=ranges)
+    if(any(cc!=1 & cc!=-1 & cc!=0)) stop("cor_kendall says function is not monotonic in all variables")
+    bounds=matrix(ifelse(cc==1,ranges$Max,ifelse(cc==-1,ranges$Min,ranges$Best)),nrow=1)    
+  }
+  ## Identify crossover point along each line of equal concern
   locs=apply(bounds,1,function(bound){
     res=tryCatch(uniroot(doutput,c(0,100),bound=bound)$root,error=function(e) NA)
   })
