@@ -549,25 +549,27 @@ var BivRadioButtonTable = Backbone.View.extend({
 		this.inputId2=this.$el.prop("id")+"_var2"
 	},
 	setselected:function(){
-		$("#"+this.inputId).find('input[name="'+this.inputId+'"][value="' + 
+		this.$el.find('input[name="'+this.inputId+'"][value="' + 
 			this.model.get('vars')[0] + '"]').prop('checked', true);
-		$("#"+this.inputId2).find('input[name="'+this.inputId2+'"][value="' + 
+		this.$el.find('input[name="'+this.inputId2+'"][value="' + 
 			this.model.get('vars')[1] + '"]').prop('checked', true);
 	},
     render: function() {
 		console.log("render BivRadioButtonTable")
 		var model=this.model;
 		var ranges=model.get("base").get('ranges');
+		console.log(ranges);
 		// Call template
-		this.$el.html(_.template($("#BivariateRadioButtonTable_template").html(),{
+		this.$el.empty().html(_.template($("#BivariateRadioButtonTable_template").html(),{
 			ranges:ranges,
 			inputId:this.inputId,
-			inputId2:this.inputId2
+			inputId2:this.inputId2,
+			id:this.$el.prop("id")
 		}));
 		//should be listenTo?
-		$("#"+this.inputId).find("input:radio").on('change',function(){
+		this.$el.find("input:radio[name='"+this.inputId+"']").on('change',function(){
 			model.set('vars',[this.value,model.get('vars')[1]])});
-		$("#"+this.inputId2).find("input:radio").on('change',function(){
+		this.$el.find("input:radio[name='"+this.inputId2+"']").on('change',function(){
 			model.set('vars',[model.get('vars')[0],this.value])});
 		this.setselected();
 		return this;

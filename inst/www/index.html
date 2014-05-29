@@ -64,34 +64,25 @@
 		</table></form>
 	</script>
 	
-	<style>
-	.rbtrow{
-		height:20px;
-		line-height:20px; /* necessary for vertical-align http://stackoverflow.com/questions/9249359/text-vertical-align-in-a-div */
-		vertical-align:middle;
-	}
-	</style>
 	<script type="text/template" id="BivariateRadioButtonTable_template">
-		<div style="position:absolute;width:60%">
-			<div class="rbtrow">Variable</div>
-			<% _.each( ranges, function( row ){ %>
-			<div class="rbtrow"><%print(row[0])%><br/></div>
-			<% }); %>
-		</div>
-		<div style="position:absolute;width:40%;right:0">
-		<div id="<%-inputId%>" style="position:absolute;width:20%">
-			<div class="rbtrow">Var 1</div>
-			<% _.each( ranges, function( row ){ %>
-			<div class="rbtrow"><input type = "radio" name="<%-inputId%>" value=<%print(row[0])%>><br/></div>
-			<% }); %>
-		</div>
-		<div id="<%-inputId2%>" style="position:absolute;width:20%;right:0">
-			<div class="rbtrow">Var 2</div>
-			<% _.each( ranges, function( row ){ %>
-			<div class="rbtrow"><input type = "radio" name="<%-inputId2%>" value=<%print(row[0])%>><br/></div>
-			<% }); %>
-		</div>
-		</div>
+		<table>
+			<thead>
+				<th>Variable</th>
+				<th></th>
+				<th>Var 1</th>
+				<th>Var 2</th>
+			</thead>
+			<tbody>
+				<% _.each( ranges, function( row ){ %>
+				<tr valign='middle'>
+					<td style='text-align:right'><%print(row[0])%></td>
+					<td><input id="<%-id%>_<%print(row[0])%>" value="<%print(row[1])%>;<%print(row[5])%>" type="slider"/></td>
+					<td style='text-align:center'><input type = "radio" name="<%-inputId%>" value=<%print(row[0])%>></td>
+					<td style='text-align:center'><input type = "radio" name="<%-inputId2%>" value=<%print(row[0])%>></td>
+				</tr>
+				<% }); %>
+			</tbody>
+		</table>
 	</script>
 
 	<div data-options="region:'north'" style="height:70px;padding:5px">
@@ -176,6 +167,7 @@
 		var biv=new BivariateAnalysis({base:analysis,output:'NPV'});
 		var bivOutputPlot = new BivOutputPlot({model:biv, el:$("#biplot")});
 		var biRadio = new BivRadioButtonTable({model:biv,el:$("#biv_table")});
+		var biSliders=new RangeSliders({model:analysis,el:$("#biv_table"),editRange:editRange_placeholder});
 		$("#biv_flip").on('change',function(){biv.set("flip",$(this).is(':checked'))});
 		ocpu.seturl("/breakdown/R")
 		//ocpu.seturl("http://josephguillaume.ocpu.io/breakdown/R")
