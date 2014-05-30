@@ -1,16 +1,16 @@
-getChildren <- function(equations,id=NULL,name,showEquation=FALSE){
+getChildren <- function(equations,id=NULL,name,open=c(),showEquation=FALSE){
   if(is.null(id) || id=="0") {
     obj <- getTop(equations)
     id=""
   } else {
     obj <- getTerms(equations[equations[,1]==name,-1])
   }
-  obj <- lapply(obj,getNode,id=id,equations=equations,showEquation=showEquation)
+  obj <- lapply(obj,getNode,id=id,equations=equations,open=open,showEquation=showEquation)
   return(obj)
 }
 
 ## return equation/value for variable n
-getNode <- function(n,equations,id,showEquation=TRUE){
+getNode <- function(n,equations,id,open=c(),showEquation=TRUE){
   if(!n %in% equations[,1]){
     ## Allow new variables, setting default value to ""
     obj <- as.list(rep("",ncol(equations)-1))
@@ -19,12 +19,15 @@ getNode <- function(n,equations,id,showEquation=TRUE){
   }
   names(obj)<-make.names(1:(ncol(equations)-1))
   
-  ## TODO: keep expanded state on reload - open ids need to be passed
-  if(any(sapply(obj,function(x) length(getTerms(x)))>0))
-    obj$state="closed"
-  
   obj$name <- n
   obj$id <- paste(id,n,sep="_")
+  
+  if(obj$id %in% open){
+    obj$state="open"
+    obj$children=getChildren(equations,id=obj$id,obj$name,open=open,showEquation=showEquation)
+  } else if(any(sapply(obj[1:(ncol(equations)-1)],function(x) length(getTerms(x)))>0)){
+    obj$state="closed"
+  }
   
   if(!showEquation){
     for(v in 1:(ncol(equations)-1)){
