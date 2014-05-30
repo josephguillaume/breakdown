@@ -160,11 +160,23 @@
 
 		</div></div>	
 		
-		<div title="Equation Breakdown">
-			<div id="tree-panel" class="easyui-panel" style="padding:5px">
-				<ul id="tt"></ul>
+		<div title="Equation Breakdown"><div class="easyui-layout" data-options="fit:true">
+			<div data-options="region:'north'" style="height:35px;padding:5px;border:false;collapsible:false">
+				<a href="#" class="easyui-linkbutton" onclick='analysis.set("showEquation",!analysis.get("showEquation"))'>Toggle equations</a>
 			</div>
-		</div>	
+			<div data-options="region:'center'" class="easyui-panel" style="padding:5px">
+				<table id="tt">
+						<thead>
+			<tr>
+				<th data-options="field:'name',editor:'text'" width="220">Name</th>
+				<th data-options="field:'X1',editor:'text',formatter:formatVector" width="300" align="right">Scenario 1</th>
+				<th data-options="field:'X2',editor:'text',formatter:formatVector" width="300" align="right">Scenario 2</th>
+				<th data-options="field:'X3',editor:'text',formatter:formatVector" width="300" align="right">Scenario 3</th>
+			</tr>
+		</thead>
+				</table>
+			</div>
+		</div></div>	
 		
 		<div title="Variable Ranges">
 			<div id="ra_tb">
@@ -230,6 +242,10 @@
 		var multOut= new MultivarResultsTable({model:mult,el:$("#mult_output"),template:$("#MultiVarResultsTable_template")});
 		ocpu.seturl("/breakdown/R")
 		//ocpu.seturl("http://josephguillaume.ocpu.io/breakdown/R")
+		var treeView = new TreeView({
+							model: analysis,
+							el: $("#tt") 
+							});
 	</script>
 	
 	

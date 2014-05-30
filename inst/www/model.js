@@ -28,7 +28,8 @@ var Analysis = Backbone.Model.extend({
 		univariate_crossover:[],
 		scens:[1,2],
 		selected_var1: null,
-		ranges_cols:["Variable","Lower","Min","Best","Max","Upper"]
+		ranges_cols:["Variable","Lower","Min","Best","Max","Upper"],
+		showEquation:false
 	},
 	EquationsfromCSV:function(csv){
 		console.log("EquationsfromCSV");

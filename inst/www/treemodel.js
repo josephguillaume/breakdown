@@ -1,63 +1,68 @@
-    
-       
-        var TreeModel = Backbone.Model.extend({
-            defaults: {
-                tree: [],
-            }
-        });   
-    
-        var TreeView = Backbone.View.extend({
-            initialize: function(){
-                // listeners for model->view binding
-             	this.model.on('change', this.render, this);      
-            },            
+var TreeView = Backbone.View.extend({
+	initialize: function(){
+		this.model.on('change:equations', this.render, this);
+		this.model.on('change:scens', this.render, this);
+		this.model.on('change:showEquation', this.render, this);
+		this.model.set('expanded',{});
+		this.setup();
+	},
+	render: function(){
+		this.$el.treegrid('reload');
+	},
+	setup: function() {    
+		var model = this.model;
+		this.$el.treegrid({
+			loader:function(param,success,error){
+				var req=ocpu.rpc('getChildren',param,function(data){
+					//TODO: these shouldn't be arrays from ocpu
+					f=function(x){
+						_.each(x,function(e,i){
+							_.each(e,function(d,j){
+								if(j=="children"){
+									f(e[j]);
+								} else {e[j]=d[0]}
+							});
+						});				
+					}
+					f(data);
+					success(data)
+				});
+				req.fail(error);
+			},
+			method:'get',
+			rownumbers: false,
+			idField: 'id',
+			treeField: 'name',
+			//onDblClickCell: edit_equation,
+			onBeforeLoad: function(row,param){
+				if (!row) {	// load top level rows
+					param.id = 0;	// set id=0, indicate to load new page rows
+				} else {
+					param.name=row.name;
+				}
+				//TODO: subset model.selectEqns(model.get('scens'))
+				param.equations=model.get("equations");
+				param.showEquation=model.get("showEquation");
+				param.open=Object.keys(model.get("expanded"));
+			},
+			onExpand:function(row){
+				model.get("expanded")[row.id]=true;
+			},
+			onCollapse:function(row){
+				delete model.get("expanded")[row.id]
+			},
+			checkOnSelect:false,
+			selectOnCheck:false
+		});
+		return this;
+	}
+});
 
-            // jquery listeners for view->model binding
-            events: {
-//                'click .tree-node' : function(e){  
-//                    this.$el.tree('beginEdit', e.target);
-//                },
 
-            },
-
-//            template: _.template("<ul id='tt' class='easyui-tree' data-options='data: <%= JSON.stringify(tree) %>' ></ul>"),  
-            
-            render: function() {    
-//                this.$el.html(this.template(this.model.attributes));
-                var model = this.model; 
-                
-                this.$el.tree({
-                                onClick: function(node){
-                                    $(this).tree('beginEdit', node.target);
-                                },
-                                onAfterEdit: function(node){
-                                    var root = $(this).tree('getRoot');
-                                    var data = $(this).tree('getData', root.target);
-                                    model.set('tree', [data]);
-                                }
-                              });
-                
-                this.$el.tree('loadData', this.model.get('tree'));
-                return this;
-        	}
-            
-        });
-
-        
-        var treeModel = new TreeModel(); 
-    
-        treeModel.fetch({
-                         url:'tree_data3.json', 
-                         success: function(){ console.log("tree loaded"); },
-                         error: function(model, response, options){ console.log("error loading tree"); },
-                        });
-        
-        var treeView = new TreeView({
-                                    model: treeModel,
-                                    el: $("#tt") 
-                                    });
-
-        
-     
-    
-    
+function formatVector(value){
+	if (value){
+		return(JSON.stringify(value).replace(/"/g,''));
+	} else {
+		return '';
+	}
+}
