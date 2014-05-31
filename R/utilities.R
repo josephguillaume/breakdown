@@ -5,11 +5,23 @@ getTerms <- function(eq,...) all.vars(parse(text=eq),...)
 ## Variables that are never referenced in equations
 ## either named list/vector of equations or matrix with first column names of variables
 ## matrix form identifies variables not referenced in any of the columns
-getTop <- function(equations,...) {
-  if(is.matrix(equations)) return(setdiff(equations[,1],getTerms(equations[,-1],...)))
-  if(is.list(equations) || is.character(equations)) 
-    return(setdiff(names(equations),getTerms(equations,...)))
-  stop("equations not a list or matrix")
+getTop <- function(equations,...,ignore=FALSE) {
+  if(is.matrix(equations)){ 
+    vals <- setdiff(equations[,1],getTerms(equations[,-1],...))
+    if(ignore){
+      ## If it has no descendants in any column
+      vals <- vals[sapply(vals,function(v) length(getTerms(equations[equations[,1]==v,-1]))!=0)]
+    }
+  }  else if(is.list(equations) || is.character(equations)){
+    vals <- setdiff(names(equations),getTerms(equations,...))
+    if(ignore){
+      ## If it has no descendants
+      vals <- vals[sapply(vals,function(v) length(getTerms(equations[v]))!=0)]
+    }
+  } else {
+    stop("equations not a list or matrix")
+  }
+  return(vals)
 }
 
 ## Variables that do not reference any other variables

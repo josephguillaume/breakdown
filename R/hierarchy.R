@@ -1,6 +1,6 @@
 getChildren <- function(equations,id=NULL,name,open=c(),showEquation=FALSE){
   if(is.null(id) || id=="0") {
-    obj <- getTop(equations)
+    obj <- getTop(equations,ignore=TRUE,functions=TRUE)
     id=""
   } else {
     obj <- getTerms(equations[equations[,1]==name,-1])
@@ -17,7 +17,7 @@ getNode <- function(n,equations,id,open=c(),showEquation=TRUE){
   } else{
     obj<-as.list(equations[equations[,1]==n,-1])
   }
-  names(obj)<-make.names(1:(ncol(equations)-1))
+  names(obj)<-sprintf("scen%d",1:(ncol(equations)-1))
   
   obj$name <- n
   obj$id <- paste(id,n,sep="_")
