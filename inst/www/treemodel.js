@@ -1,3 +1,23 @@
+$.extend($.fn.treegrid.methods, {
+	editCell: function(jq,param){
+		return jq.each(function(){
+			var fields = $(this).treegrid('getColumnFields',true).concat($(this).treegrid('getColumnFields'));
+			for(var i=0; i<fields.length; i++){
+				var col = $(this).treegrid('getColumnOption', fields[i]);
+				col.editor1 = col.editor;
+				if (fields[i] != param.field){
+					col.editor = null;
+				}
+			}
+			$(this).treegrid('beginEdit', param.index);
+			for(var i=0; i<fields.length; i++){
+				var col = $(this).treegrid('getColumnOption', fields[i]);
+				col.editor = col.editor1;
+			}
+		});
+	}
+});
+
 var TreeView = Backbone.View.extend({
 	initialize: function(){
 		this.model.on('change:equations', this.render, this);
@@ -33,15 +53,13 @@ var TreeView = Backbone.View.extend({
 			rownumbers: false,
 			idField: 'id',
 			treeField: 'name',
-			//onDblClickCell: edit_equation,
 			onBeforeLoad: function(row,param){
 				if (!row) {	// load top level rows
 					param.id = 0;	// set id=0, indicate to load new page rows
 				} else {
 					param.name=row.name;
 				}
-				//TODO: subset model.selectEqns(model.get('scens'))
-				param.equations=model.get("equations");
+				param.equations=model.selectEqns(model.get('scens'));
 				param.showEquation=model.get("showEquation");
 				param.open=Object.keys(model.get("expanded"));
 			},
@@ -51,6 +69,45 @@ var TreeView = Backbone.View.extend({
 			onCollapse:function(row){
 				delete model.get("expanded")[row.id]
 			},
+			onDblClickCell: function(field,row){
+				if(!model.get('showEquation')) return false;
+				var dg=$(this);
+				var index=row.id;
+				dg.treegrid('editCell', {index:index,field:field});
+				var ed = dg.treegrid('getEditor', {id:index,field:field});
+				$(ed.target).focus();
+				$(ed.target).on('blur',function(e){
+					e.stopPropagation();
+					dg.treegrid('endEdit', index);
+				}).on('keydown',function(e){
+					if(e.keyCode==13){dg.treegrid('endEdit', index);return false;}
+				}).on('keydown',function(e){
+					if(e.keyCode==27){dg.treegrid('cancelEdit', index);return false;}
+				});
+			},
+			onAfterEdit: function(rowData,changes){
+									console.log('TreeView onAfterEdit');
+									var name=rowData.name;
+									var data=model.get('equations').map(function(arr){return arr.slice();});
+									var names=data.map(function(x){return x[0]});
+									var index=names.indexOf(name);
+									var scens=model.get("scens");
+									if(index==-1){
+										//add a new variable
+										index=data.push([name])-1; 
+										//all scenarios need to be present
+										// for ocpu to send a matrix not a list
+										for(i=0;i<model.get("header").length;i++){
+											if(!data[index][i]) data[index][i]="";
+										}
+									}
+									if(changes.scen1) data[index][scens[0]]=changes.scen1;
+									if(changes.scen2) data[index][scens[1]]=changes.scen2;
+									//TODO: allow renaming throughout the matrix	
+									if(changes.Variable) data[index][0]=changes.Variable;
+									console.log(data);
+									model.set('equations',data);
+                                },
 			checkOnSelect:false,
 			selectOnCheck:false
 		});

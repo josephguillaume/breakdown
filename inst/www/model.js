@@ -238,6 +238,11 @@ var DGEquations = Backbone.View.extend({
 									console.log('DGEquations onAfterEdit');
 									var data=model.get('equations').map(function(arr){return arr.slice();});
 									if(index >= data.length) data[index]=[]; //add a new variable
+									//all columns need to be present
+									// for ocpu to send a matrix not a list
+									for(i=0;i<model.get("header").length;i++){
+										if(!data[index][i]) data[index][i]="";
+									}
 									if(changes.scen1) data[index][scens[0]]=changes.scen1;
 									if(changes.scen2) data[index][scens[1]]=changes.scen2;
 									//TODO: allow renaming throughout the matrix	
