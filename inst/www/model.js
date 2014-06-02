@@ -38,6 +38,35 @@ var Analysis = Backbone.Model.extend({
 		this.set('equations',csv);
 		return this;
 	},
+	AllToCSV:function(){
+		// Merge equations,notes,ranges
+		var eqns=this.get('equations').map(function(arr){return arr.slice();});
+		var vars_eqns=eqns.map(function(x){return x[0]});
+		var ranges=this.get('ranges').map(function(arr){return arr.slice();});
+		var vars_ranges=ranges.map(function(x){return x[0]});
+		var head_eqns=this.get("header").slice();
+		head_eqns.splice(0,1);
+		var out=[[].concat(
+			this.get("ranges_cols"),
+			["bestguess","bounds","direction","is.problem"],
+			head_eqns
+		)];
+		$.each(vars_eqns,function(i,v){
+			var row_eqns=eqns[i].slice();
+			var var_name=row_eqns.splice(0,1);
+			var row_notes=["","","","",""];
+			var row_ranges=["","","","",""];
+			var idx_ranges=vars_ranges.indexOf(v);
+			if(idx_ranges > -1){
+				row_ranges=ranges[idx_ranges].slice();
+				row_ranges.splice(0,1);
+				for(i=0;i<5;i++){if(!row_ranges[i]){row_ranges[i]=""}}
+			}
+			out.push([].concat([var_name],row_ranges,row_notes,row_eqns));
+		});
+		var csv=out.map(function(row){return row.map(function(x){return '"'+x+'"'}).join(";")}).join("\n");
+		return csv
+	},
 	delVar:function(variable,dgname){
 		console.log('delVar '+variable+' in '+dgname);
 		if(variable==undefined) return(this);
@@ -770,3 +799,9 @@ var MultivarResultsTable = Backbone.View.extend({
 		}));
 	}
 });
+
+
+downloadCSV=function(model){
+	var data=model.AllToCSV();
+	window.open('data:text/csv;charset=utf8,' + encodeURIComponent(data))
+}

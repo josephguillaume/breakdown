@@ -142,8 +142,9 @@
 	<div id="tabs" data-options="region:'center',plain:true,tabPosition:'left',headerWidth:170" class="easyui-tabs">	
 	
 		<div title="Load" style="padding:20px">
-			<input type="file" id="csvEquationsInput" onchange="readCsv(this.files,function(x){analysis.EquationsfromCSV(x)})" accept=".csv"><p/>
-			<a href="#" class="easyui-linkbutton" onclick='setDefault(analysis)'>Set default ranges</a> - calculates analysis bounds as 1% and 1000% of the modeled numeric values defined in the equations
+			<label for='csvEquationsInput'>Load equations CSV</label>&nbsp;<input type="file" id="csvEquationsInput" onchange="readCsv(this.files,function(x){analysis.EquationsfromCSV(x)})" accept=".csv"><p/>
+			<a href="#" class="easyui-linkbutton" onclick='setDefault(analysis)'>Set default ranges</a> - calculates analysis bounds as 1% and 1000% of the modeled numeric values defined in the equations<p/>
+			<a id="dl_csv" class="easyui-linkbutton" download='breakdown.csv' onclick='downloadCSV(analysis)'>Download combined CSV</a>
 		</div>
 	
 		<div title="Equations" data-options="fit:true"><div class="easyui-layout" data-options="fit:true">
