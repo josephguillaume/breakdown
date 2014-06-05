@@ -222,6 +222,7 @@ var DGEquations = Backbone.View.extend({
     initialize: function(){
         this.model.on('change:equations', this.render, this);
 		this.model.on('change:scens', this.render, this);
+		this.model.on('change:header', this.render, this);
 		this.model.on('change:selected_var1',this.setSelected,this)
         this.render();
     }, 
@@ -281,6 +282,19 @@ var DGEquations = Backbone.View.extend({
                                 },
 			checkOnSelect:false,
 			selectOnCheck:false
+		});
+		this.$el.closest(".datagrid-view").find(".datagrid-header-row td").on('dblclick',function(){
+			var field=$(this).attr('field');
+			if(field=="Variable") idx=0
+			if(field=="scen1") idx=model.get('scens')[0]
+			if(field=="scen2") idx=model.get('scens')[1]
+			var header=model.get('header').slice();
+			var oldname=header[idx];
+			var newname=prompt("Rename '"+oldname+"' to:",oldname);
+			if(newname) {
+				header[idx]=newname;
+				model.set('header',header);
+			}
 		});
         return this;
    }
