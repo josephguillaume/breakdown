@@ -19,10 +19,12 @@ $.extend($.fn.treegrid.methods, {
 });
 
 var TreeView = Backbone.View.extend({
+	//model is an Analysis
 	initialize: function(){
-		this.model.on('change:equations', this.render, this);
-		this.model.on('change:scens', this.render, this);
-		this.model.on('change:showEquation', this.render, this);
+		this.listenTo(this.model,'change:equations', this.render, this);
+		this.listenTo(this.model,'change:showEquation', this.render, this);
+		this.listenTo(this.model,'change:scens', this.setup, this);
+		this.listenTo(this.model,'change:header', this.setup, this);
 		this.model.set('expanded',{});
 		this.setup();
 	},
@@ -53,6 +55,13 @@ var TreeView = Backbone.View.extend({
 			rownumbers: false,
 			idField: 'id',
 			treeField: 'name',
+			columns:[[
+				{field:'name',title:model.get('header')[0],width:220,editor:'text'},
+				{field:'scen1',title:model.get('header')[model.get('scens')[0]],width:300,
+					editor:'text',formatter:formatVector,align:'right'},
+				{field:'scen2',title:model.get('header')[model.get('scens')[1]],width:300,
+					editor:'text',formatter:formatVector,align:'right'}
+			]],		
 			onBeforeLoad: function(row,param){
 				if (!row) {	// load top level rows
 					param.id = 0;	// set id=0, indicate to load new page rows
