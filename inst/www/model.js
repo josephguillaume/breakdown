@@ -87,8 +87,9 @@ var Analysis = Backbone.Model.extend({
 		});
 		return(eqns);
 	},
-	getRanges:function(vars,asArray=true){
+	getRanges:function(vars,asArray){
 		if(!vars) return(null);
+		asArray = typeof asArray !== 'undefined' ? asArray : true;
 		if(!$.isArray(vars)) var vars=[vars];
 		var ranges=this.get('ranges').map(function(arr){return arr.slice();});
 		ranges=$.grep(ranges,function(e,i){
@@ -805,3 +806,30 @@ downloadCSV=function(model){
 	var data=model.AllToCSV();
 	window.open('data:text/csv;charset=utf8,' + encodeURIComponent(data))
 }
+
+var SelectScens = Backbone.View.extend({
+	//model is an Analysis
+    initialize: function(args){
+		//0-based index of model.scens that is linked to this view
+		this.wscen=args.wscen;
+		this.listenTo(this.model,"change:header",this.render);
+		this.listenTo(this.model,"change:scens",this.render);
+	},
+	render: function(){
+		var model=this.model;
+		var view=this;
+		var opts=model.get("header").map(function(e,i){return {id:i,text:e}})
+		opts.splice(0,1);
+		this.$el.combobox({
+			valueField:'id',
+			textField:'text',
+			data:opts,
+			onSelect:function(rec){
+				var scens=model.get('scens').slice();
+				scens[view.wscen]=rec.id;
+				model.set('scens',scens);
+			}
+		});
+		this.$el.combobox('select',model.get('scens')[view.wscen]);
+	}
+});
