@@ -1,13 +1,14 @@
 
 // http://mounirmesselmeni.github.io/2012/11/20/javascript-csv/
-readCsv = function(files,handler){
-   if (window.FileReader) {
+readCsv = function(files,handler,separator){
+	if(!separator) separator=","
+	if (window.FileReader) {
 		var reader = new FileReader();
 		if(files.length==0) return null;
 		reader.readAsText(files[0]);
 		reader.onload = function(event){
 			//http://code.google.com/p/jquery-csv/downloads/list
-			var result = $.csv.toArrays(event.target.result);
+			var result = $.csv.toArrays(event.target.result,{separator:separator});
 			//console.log(result);
 			handler(result);
 		};
@@ -39,6 +40,28 @@ var Analysis = Backbone.Model.extend({
 		this.set('equations',csv);
 		return this;
 	},
+	AllFromCSV:function(csv){
+		console.log("AllFromCSV");
+		//Equations header
+		var header=csv[0].slice(10,csv[0].length);
+		header.unshift(csv[0][0]);
+		this.set('header',header);
+		//Equations
+		var equations=csv.map(function(x){
+			var row=x.slice(10,csv[0].length);
+			row.unshift(x[0]);
+			return row
+		});
+		equations.splice(0,1); //remove header
+		this.set('equations',equations);
+		//Ranges
+		var ranges=csv.map(function(x){
+			return x.slice(0,6);
+		});
+		ranges.splice(0,1); //remove header
+		this.set('ranges',ranges);
+		return this;
+	},
 	AllToCSV:function(){
 		// Merge equations,notes,ranges
 		var eqns=this.get('equations').map(function(arr){return arr.slice();});
@@ -65,7 +88,7 @@ var Analysis = Backbone.Model.extend({
 			}
 			out.push([].concat([var_name],row_ranges,row_notes,row_eqns));
 		});
-		var csv=out.map(function(row){return row.map(function(x){return '"'+x+'"'}).join(";")}).join("\n");
+		var csv=out.map(function(row){return row.map(function(x){return '"'+(x+'').replace(/"/g,'""')+'"'}).join(";")}).join("\n");
 		return csv
 	},
 	delVar:function(variable,dgname){
