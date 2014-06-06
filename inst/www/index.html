@@ -140,13 +140,44 @@
 	</div>
 		
 	<div id="tabs" data-options="region:'center',plain:true,tabPosition:'left',headerWidth:170" class="easyui-tabs">	
-	
+		<style>
+			.l-btn{
+				vertical-align:middle;
+			}
+			.button-sep{
+				display:inline-block;
+				width:0;
+				height:22px;
+				border-left:1px solid #ccc;
+				border-right:1px solid #fff;
+				vertical-align:middle;
+			}
+		</style>
 		<div title="Load" style="padding:20px">
-			<label for='csvEquationsInput'>Load equations CSV</label>&nbsp;<input type="file" id="csvEquationsInput" onchange="readCsv(this.files,function(x){analysis.EquationsfromCSV(x)})" accept=".csv"><p/>
-			<a href="#" class="easyui-linkbutton" onclick='setDefault(analysis)'>Set default ranges</a> - calculates analysis bounds as 1% and 1000% of the modeled numeric values defined in the equations<p/>
-			<a id="dl_csv" class="easyui-linkbutton" download='breakdown.csv' onclick='downloadCSV(analysis)'>Download combined CSV</a><p/>
-			<label for='select_base'>Baseline: </label><input id="select_base">			
-			<label for='select_scen'>Scenario: </label><input id="select_scen">
+			
+			<div class="easyui-panel" style="padding:5px;">
+				<a href="#" class="easyui-linkbutton" onclick='$("csvEquationsInput").click()' data-options='plain:true,iconCls:"icon-tip"'>Load demo</a>
+				<span class="button-sep"></span>
+				<a href="#" class="easyui-linkbutton" onclick='$("#csvEquationsInput").click()' data-options='plain:true,iconCls:"icon-add"'>Load equations CSV</a>
+				<input type="file" id="csvEquationsInput" onchange="readCsv(this.files,function(x){analysis.EquationsfromCSV(x)})" accept=".csv" style="display:none">
+				<span class="button-sep"></span>
+				<a href="#" class="easyui-linkbutton" onclick='setDefault(analysis)' data-options='plain:true,iconCls:"icon-sum"'>Set default ranges</a>
+				<span class="button-sep"></span>
+				<a id="dl_csv" class="easyui-linkbutton" download='breakdown.csv' onclick='downloadCSV(analysis)' data-options='plain:true,iconCls:"icon-save"'>Download combined CSV</a>
+				<span class="button-sep"></span>
+			</div>
+			<h2>Load equations and ranges</h2>
+			<li>'Load equations CSV' expects a CSV with first column the name of each variable, and other columns the equation to calculate each variable</li>
+			<li>'Set default ranges' calculates default analysis bounds as 1% and 1000% of the modeled numeric values defined in the equations</li>
+			<h2>Save equations and ranges</h2>
+			<li>'Download combined csv' exports a csv that includes ranges, notes and equations for all variables</li>
+			<h2>Define settings</h2>
+			<style>
+			.unknown-scen{color:red}
+			</style>
+			<label for='select_base'>Baseline: </label><input id="select_base" name="select_base" value="">			
+			<label for='select_scen'>Scenario: </label><input id="select_scen" name="select_scen" value="">
+			<a class="easyui-linkbutton" onclick='addScens(analysis,[$("#select_base").combobox("getText"),$("#select_scen").combobox("getText")])'>Add new scenarios</a>
 		</div>
 	
 		<div title="Equations" data-options="fit:true"><div class="easyui-layout" data-options="fit:true">

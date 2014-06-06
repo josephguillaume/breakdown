@@ -3,6 +3,7 @@
 readCsv = function(files,handler){
    if (window.FileReader) {
 		var reader = new FileReader();
+		if(files.length==0) return null;
 		reader.readAsText(files[0]);
 		reader.onload = function(event){
 			//http://code.google.com/p/jquery-csv/downloads/list
@@ -837,8 +838,25 @@ var SelectScens = Backbone.View.extend({
 		this.$el.combobox({
 			valueField:'id',
 			textField:'text',
+			selectOnNavigation:true,
 			data:opts,
+			onChange:function(oldval,newval){
+				if(oldval==newval) return null;
+				if(newval=="") return null;
+				if(!newval) return null;
+				if(!isNaN(parseInt(newval))) return null;
+				var idx=model.get("header").indexOf(newval);
+				if(idx>0){
+					view.$el.next().find("input").toggleClass("unknown-scen",false);
+					var scens=model.get('scens').slice();
+					scens[view.wscen]=idx;
+					model.set('scens',scens);
+				} else {
+					view.$el.next().find("input").toggleClass("unknown-scen",true);
+				}
+			},
 			onSelect:function(rec){
+				view.$el.next().find("input").toggleClass("unknown-scen",false);
 				var scens=model.get('scens').slice();
 				scens[view.wscen]=rec.id;
 				model.set('scens',scens);
@@ -847,3 +865,22 @@ var SelectScens = Backbone.View.extend({
 		this.$el.combobox('select',model.get('scens')[view.wscen]);
 	}
 });
+
+addScens=function(model,scen_vals){
+	_.each(scen_vals,function(e,wscen){
+		var header=model.get('header').slice();
+		if(header.indexOf(e)==-1){
+			newidx=header.length;
+			//create a blank column
+			//change directly to not trigger events
+			var equations=model.get('equations');
+			for(i=0;i<equations.length;i++){if(!equations[i][newidx]){equations[i][newidx]=""}}
+			//then add it to the header
+			header.push(e);
+			model.set('header',header);
+			//and set selected scenarios
+			var scens=model.get('scens').slice();
+			scens[wscen]=newidx;
+			model.set('scens',scens);
+	}});
+};
