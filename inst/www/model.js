@@ -24,7 +24,7 @@ readCsv = function(files,handler){
 var Analysis = Backbone.Model.extend({
 	defaults: {
 		equations: [],
-		header:[],
+		header:["Variable"],
 		ranges:[],
 		univariate_crossover:[],
 		scens:[1,2],
@@ -826,12 +826,14 @@ var SelectScens = Backbone.View.extend({
 		this.wscen=args.wscen;
 		this.listenTo(this.model,"change:header",this.render);
 		this.listenTo(this.model,"change:scens",this.render);
+		this.render();
 	},
 	render: function(){
 		var model=this.model;
 		var view=this;
 		var opts=model.get("header").map(function(e,i){return {id:i,text:e}})
 		opts.splice(0,1);
+		if(opts.length==0) opts=[{id:1,text:""},{id:2,text:""}];
 		this.$el.combobox({
 			valueField:'id',
 			textField:'text',
@@ -853,6 +855,7 @@ var SelectScens = Backbone.View.extend({
 				}
 			},
 			onSelect:function(rec){
+				if(!rec) return null;
 				view.$el.next().find("input").toggleClass("unknown-scen",false);
 				var scens=model.get('scens').slice();
 				scens[view.wscen]=rec.id;
