@@ -119,6 +119,7 @@ var Analysis = Backbone.Model.extend({
 	},
 	evaluate:function(column,variable){
 		if(this.get('equations').length==0) return(this)
+		//get named vector of equations for the column
 		dict={};
 		for(i=0;i<this.get('equations').length;i++){
 			dict[this.get('equations')[i][0]]=this.get('equations')[i][column]
@@ -431,29 +432,31 @@ var OutputStats = Backbone.View.extend({
 		//if values doesn't exist yet, set it
 		if(this.model.get(this.variable)==undefined) {
 			var vals=[];
-			vals[this.scens[1]]=NaN;
-			vals[this.scens[0]]=NaN;
+			vals[this.model.get('scens')[1]]=NaN;
+			vals[this.model.get('scens')[0]]=NaN;
 			this.model.set(this.variable,vals);
 		}
-		this.model.on('change:'+this.variable, function(){this.render()}, this);	
-		this.model.on('change:equations', function(){this.evaluate()}, this);
+		this.listenTo(this.model,'change:'+this.variable, this.render, this);	
+		this.listenTo(this.model,'change:equations', this.evaluate, this);
+		this.listenTo(this.model,'change:scens',this.evaluate, this);
         this.render(); //otherwise will be blank
     }, 
 	variable: null,
-	scens:[1,2],
 	evaluate : function(){
 		console.log("OutputStats calling evaluate for "+this.variable);
-		this.model.evaluate(this.scens[1],this.variable); //scen
-		this.model.evaluate(this.scens[0],this.variable); //baseline
+		//TODO: don't necessarily need to re-evaluate every time.
+		this.model.evaluate(this.model.get('scens')[1],this.variable); //scen
+		this.model.evaluate(this.model.get('scens')[0],this.variable); //baseline
+		this.render();
 	},
     render: function() {
 		var vals=this.model.get(this.variable);
 		console.log("OutputStats rendering "+this.variable);
 		this.$el.html(_.template($("#outputstats_template").html(),{
-			scen:this.model.get('header')[this.scens[1]],
-			baseline:this.model.get('header')[this.scens[0]],
-			scen_value:vals[this.scens[1]],
-			baseline_value:vals[this.scens[0]],
+			scen:this.model.get('header')[this.model.get('scens')[1]],
+			baseline:this.model.get('header')[this.model.get('scens')[0]],
+			scen_value:vals[this.model.get('scens')[1]],
+			baseline_value:vals[this.model.get('scens')[0]],
 			variable:this.variable
 			}));
 		return this;

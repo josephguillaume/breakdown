@@ -32,8 +32,8 @@
 <body class="easyui-layout">
 
 	<script type="text/template" id="outputstats_template">
-		<%-variable%> of <%- scen %>: $<% print((scen_value).toFixed(2)) %><br/>
 		<%-variable%> of <%- baseline %>: $<% print((baseline_value).toFixed(2)) %><br/>
+		<%-variable%> of <%- scen %>: $<% print((scen_value).toFixed(2)) %><br/>
 		difference: $<% print((scen_value-baseline_value).toFixed(2)) %>	
 	</script>
 	
