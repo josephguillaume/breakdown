@@ -55,7 +55,7 @@ var Analysis = Backbone.Model.extend({
 		$.each(vars_eqns,function(i,v){
 			var row_eqns=eqns[i].slice();
 			var var_name=row_eqns.splice(0,1);
-			var row_notes=["","","","",""];
+			var row_notes=["","","",""];
 			var row_ranges=["","","","",""];
 			var idx_ranges=vars_ranges.indexOf(v);
 			if(idx_ranges > -1){
