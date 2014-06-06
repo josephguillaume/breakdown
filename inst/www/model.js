@@ -419,9 +419,7 @@ var SingleOutputPlot = Backbone.View.extend({
 					equations:model.selectEqns(model.get('scens')),
 					x:model.get("selected_var1"),y:this.output,
 					ranges0:ranges0,
-					scens:$.grep(model.get('header'),function(e,i){
-						return($.inArray(i,model.get("scens"))>-1);
-					})
+					scens:model.get("scens").map(function(i){return model.get('header')[i]})
 				})
 		return this;
 	}
