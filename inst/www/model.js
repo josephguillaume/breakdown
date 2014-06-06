@@ -80,11 +80,10 @@ var Analysis = Backbone.Model.extend({
 	},
 	selectEqns:function(indices){
 		var eqns=this.get('equations').map(function(x){
-			// For each row
-			return($.grep(x,function(e,i){
-				// Return name and elements with desired indices
-				return(i==0 || $.inArray(i,indices)>-1);
-			}))
+			// For each row, return name and desired indices
+			var row=indices.map(function(i){return x[i]});
+			row.unshift(x[0]);
+			return row;
 		});
 		return(eqns);
 	},
