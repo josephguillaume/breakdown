@@ -456,10 +456,7 @@ var OutputStats = Backbone.View.extend({
 		this.variable=args.variable;
 		//if values doesn't exist yet, set it
 		if(this.model.get(this.variable)==undefined) {
-			var vals=[];
-			vals[this.model.get('scens')[1]]=NaN;
-			vals[this.model.get('scens')[0]]=NaN;
-			this.model.set(this.variable,vals);
+			this.model.set(this.variable,[NaN,NaN,NaN]);
 		}
 		this.listenTo(this.model,'change:'+this.variable, this.render, this);	
 		this.listenTo(this.model,'change:equations', this.evaluate, this);
@@ -472,7 +469,6 @@ var OutputStats = Backbone.View.extend({
 		//TODO: don't necessarily need to re-evaluate every time.
 		this.model.evaluate(this.model.get('scens')[1],this.variable); //scen
 		this.model.evaluate(this.model.get('scens')[0],this.variable); //baseline
-		this.render();
 	},
     render: function() {
 		var vals=this.model.get(this.variable);
@@ -496,15 +492,16 @@ var UnivariateTable = Backbone.View.extend({
 		//uniSliders will be updated on render here instead
 		this.uniSliders.stopListening();
 		
-		this.model.on('change:ranges', this.calc, this);
-		this.model.on('change:equations', this.calc, this);
-		this.model.on('change:selected_var1',this.setselected,this);
-		this.model.on('change:scens',this.calc,this);
-		this.model.on('change:univariate_crossover', this.render, this);
-		this.model.on('change:ranges', this.render, this);
+		this.listenTo(this.model,'change:ranges', this.calc, this);
+		this.listenTo(this.model,'change:equations', this.calc, this);
+		this.listenTo(this.model,'change:scens',this.calc,this);
+		this.listenTo(this.model,'change:selected_var1',this.setselected,this);
+		this.listenTo(this.model,'change:univariate_crossover', this.render, this);
+		this.listenTo(this.model,'change:ranges', this.render, this);
 		this.render();
 	},
 	calc:function(){
+		//async change to model, so render called on change:univariate_crossover
 		this.model.univariateCrossover(this.output);
 		return this;
 	},
