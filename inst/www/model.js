@@ -59,6 +59,8 @@ var Analysis = Backbone.Model.extend({
 			return x.slice(0,6);
 		});
 		ranges.splice(0,1); //remove header
+		//remove empty rows
+		ranges=ranges.filter(function(v,i){return v[1]!=""|v[2]!=""|v[3]!=""|v[4]!=""|v[5]!=""});
 		this.set('ranges',ranges);
 		return this;
 	},
