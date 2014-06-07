@@ -909,3 +909,10 @@ addScens=function(model,scen_vals){
 			model.set('scens',scens);
 	}});
 };
+
+loadDemo=function(model){
+	var req=ocpu.rpc("getCombinedCSV",{},function(data){ 
+		console.log('loadDemo');
+		model.AllFromCSV(data);
+	})
+}

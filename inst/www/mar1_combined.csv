@@ -1,0 +1,110 @@
+"Variable";"Lower";"Min";"Best";"Max";"Upper";"bestguess";"bounds";"direction";"is.problem";"base";"basin";"injection"
+"annual.cash.flow";"";"";"";"";"";"";"";"";"";"benefit-cost";"benefit-cost";"benefit-cost"
+"asr.capacity.ml";"100";"100";"600";"1200";"1200";"";"";"";"";"asr.ml";"asr.ml";"asr.ml"
+"asr.capital.cost.per.ml";"100";"100";"310";"2000";"2000";"";"";"";"";"310";"310";"310"
+"asr.cost.temp.storage.per.ml";"";"";"";"";"";"";"";"";"";"1000";"1000";"1000"
+"asr.design.cost";"";"";"";"";"";"";"";"";"";"20000";"20000";"20000"
+"asr.loss.rate";"0.1";"0.1";"0.15";"0.25";"0.25";"";"";"";"";"0.15";"0.15";"0.15"
+"asr.maintenance.rate";"0.03";"0.03";"0.03";"0.1";"0.1";"";"";"";"";"0.03";"0.03";"0.03"
+"asr.ml";"";"";"";"";"";"";"";"";"";"0";"as.numeric(water.available[""surface.regular.license.ml""] + water.available[""supplementary""])";"as.numeric(water.available[""surface.regular.license.ml""] + water.available[""supplementary""])"
+"asr.treatment.capital.cost";"";"";"";"";"";"";"";"";"";"50000";"50000";"50000"
+"asr.treatment.cost.per.ml";"0";"0";"150";"200";"200";"";"";"";"";"150";"150";"150"
+"basin.capital.cost.per.ml";"";"";"";"";"";"";"";"";"";"";"basin.capital.cost.per.ml.at.0.5.m.per.day*0.5/basin.infiltration.rate";"basin.capital.cost.per.ml.at.0.5.m.per.day*0.5/basin.infiltration.rate"
+"basin.capital.cost.per.ml.at.0.5.m.per.day";"100";"100";"277";"10000";"10000";"";"";"";"";"277";"277";"277"
+"basin.cost.temp.storage.per.ml";"";"";"";"";"";"";"";"";"";"1000";"1000";"1000"
+"basin.design.cost";"";"";"";"";"";"";"";"";"";"10000";"10000";"10000"
+"basin.infiltration.rate";"0.1";"0.1";"0.5";"2";"2";"";"";"";"";"0.5 #m/day";"0.5 #m/day";"0.5 #m/day"
+"basin.maintenance.rate";"0.03";"0.03";"0.03";"0.1";"0.1";"";"";"";"";"0.03";"0.03";"0.03"
+"benefit";"";"";"";"";"";"";"";"";"";"sum(net.farm.income)";"sum(net.farm.income)";"sum(net.farm.income)"
+"capital.cost";"";"";"";"";"";"";"";"";"";"farm.dam.cost";"basin.design.cost+basin.capital.cost.per.ml*asr.capacity.ml+temporary.storage.cost";"asr.design.cost + asr.capital.cost.per.ml *            asr.capacity.ml + asr.treatment.capital.cost + temporary.storage.cost"
+"capture.pump.cost.dollar.per.ml.mar";"";"";"";"";"";"";"";"";"";"";"pump.cost.dollar.per.ml * capture.pump.cost.ratio.mar";"pump.cost.dollar.per.ml * capture.pump.cost.ratio.mar"
+"capture.pump.cost.dollar.per.ml.surface";"";"";"";"";"";"";"";"";"";"pump.cost.dollar.per.ml * capture.pump.cost.ratio.surface";"";""
+"capture.pump.cost.ratio.mar";"";"";"";"";"";"";"";"";"";"0.6";"0.6";"0.6"
+"capture.pump.cost.ratio.surface";"";"";"";"";"";"";"";"";"";"0.5";"0.5";"0.5"
+"cost";"";"";"";"";"";"";"";"";"";"annualised.capital.cost(capital.cost,discount.rate,nyears)+ongoing.cost";"annualised.capital.cost(capital.cost,discount.rate,nyears)+ongoing.cost+net.environmental.cost";"annualised.capital.cost(capital.cost,discount.rate,nyears)+ongoing.cost+net.environmental.cost"
+"crop.water.requirement.ml.per.ha";"";"";"";"";"";"";"";"";"";"c(
+ cotton=7.9,
+ faba.bean=2.7,
+ cultivated.dryland=0
+)";"c(
+ cotton=7.9,
+ faba.bean=2.7,
+ cultivated.dryland=0
+)";"c(
+ cotton=7.9,
+ faba.bean=2.7,
+ cultivated.dryland=0
+)"
+"discount.rate";"0.05";"0.05";"0.07";"0.2";"0.2";"";"";"";"";"0.07";"0.07";"0.07"
+"farm.dam.cost";"";"";"";"";"";"";"";"";"";"farmdam.cost.per.ml*total.surface.water";"0";"0"
+"farm.dam.maintenance";"";"";"";"";"";"";"";"";"";"farm.dam.maintenance.rate*farm.dam.cost";"";""
+"farm.dam.maintenance.rate";"";"";"";"";"";"";"";"";"";"0.03";"0.03";"0.03"
+"farmdam.cost.per.ml";"";"";"";"";"";"";"";"";"";"2250";"2250";"2250"
+"gross.margin.per.ha";"";"";"";"";"";"";"";"";"";"gross.value.per.yield-variable.cost.per.ha";"gross.value.per.yield-variable.cost.per.ha";"gross.value.per.yield-variable.cost.per.ha"
+"gross.margin.per.ml";"";"";"";"";"";"";"";"";"";"gross.margin.per.ha/crop.water.requirement.ml.per.ha";"gross.margin.per.ha/crop.water.requirement.ml.per.ha";"gross.margin.per.ha/crop.water.requirement.ml.per.ha"
+"gross.value.per.yield";"";"";"";"";"";"";"";"";"";"yield.per.ha*price.per.yield";"yield.per.ha*price.per.yield";"yield.per.ha*price.per.yield"
+"land.used.ha";"";"";"";"";"";"";"";"";"";"c(cotton=total.land.used,faba.bean=total.land.used,cultivated.dryland=280)";"c(cotton=total.land.used,faba.bean=total.land.used,cultivated.dryland=280)";"c(cotton=total.land.used,faba.bean=total.land.used,cultivated.dryland=280)"
+"net.environmental.cost";"0";"0";"0";"1000000";"1000000";"";"";"";"";"0";"0";"0"
+"net.farm.income";"";"";"";"";"";"";"";"";"";"total.farm.gross.margin-overhead.cost";"total.farm.gross.margin-overhead.cost";"total.farm.gross.margin-overhead.cost"
+"net.farm.income.per.ml";"";"";"";"";"";"";"";"";"";"net.farm.income/water.applied.ml";"net.farm.income/water.applied.ml";"net.farm.income/water.applied.ml"
+"net.water.available";"";"";"";"";"";"";"";"";"";"sum(water.available)-surface.evap.rate*total.surface.water";"sum(water.available)-asr.loss.rate*asr.ml";"sum(water.available)-asr.loss.rate*asr.ml"
+"NPV";"";"";"";"";"";"";"";"";"";"annual.cash.flow * ((1+discount.rate)^(-nyears)-1)/(-discount.rate)";"annual.cash.flow * ((1+discount.rate)^(-nyears)-1)/(-discount.rate)";"annual.cash.flow * ((1+discount.rate)^(-nyears)-1)/(-discount.rate)"
+"nyears";"";"";"";"";"";"";"";"";"";"50";"50";"50"
+"ongoing.cost";"";"";"";"";"";"";"";"";"";"pump.cost+farm.dam.maintenance+surface.pump.cost";"basin.maintenance.cost+surface.pump.cost+  pump.cost";"asr.treatment.cost + asr.maintenance.cost + pump.cost + surface.pump.cost"
+"basin.maintenance.cost";"";"";"";"";"";"";"";"";"";"0";"basin.maintenance.rate*basin.capital.cost.per.ml*asr.capacity.ml";"0"
+"asr.treatment.cost";"";"";"";"";"";"";"";"";"";"0";"0";"asr.treatment.cost.per.ml * asr.ml "
+"asr.maintenance.cost";"";"";"";"";"";"";"";"";"";"0";"0";"asr.maintenance.rate * (asr.capital.cost.per.ml * asr.capacity.ml + asr.treatment.capital.cost)"
+"overhead.cost";"";"";"";"";"";"";"";"";"";"total.overhead.cost*total.contrib.farm.income";"total.overhead.cost*total.contrib.farm.income";"total.overhead.cost*total.contrib.farm.income"
+"price.per.yield";"";"";"";"";"";"";"";"";"";"c(
+ cotton=538,
+ faba.bean=348,
+ cultivated.dryland=(348+244)/2
+)";"c(
+ cotton=538,
+ faba.bean=348,
+ cultivated.dryland=(348+244)/2
+)";"c(
+ cotton=538,
+ faba.bean=348,
+ cultivated.dryland=(348+244)/2
+)"
+"pump.cost";"";"";"";"";"";"";"";"";"";"pump.vol.ml*pump.cost.dollar.per.ml";"pump.vol.ml*pump.cost.dollar.per.ml";"pump.vol.ml*pump.cost.dollar.per.ml"
+"pump.cost.dollar.per.ml";"6.25";"6.25";"35";"100";"100";"";"";"";"";"35";"35";"35"
+"pump.vol.ml";"";"";"";"";"";"";"";"";"";"as.numeric(water.available[""groundwater""])";"as.numeric(water.available[""groundwater""]+(1-asr.loss.rate)*asr.ml)";"as.numeric(water.available[""groundwater""]+(1-asr.loss.rate)*asr.ml)"
+"surface.evap.rate";"0";"0";"0.35";"0.5";"0.5";"";"";"";"";"0.35";"0.35";"0.35"
+"surface.pump.cost";"";"";"";"";"";"";"";"";"";"total.surface.water*capture.pump.cost.dollar.per.ml.surface";"total.surface.water*capture.pump.cost.dollar.per.ml.mar";"total.surface.water*capture.pump.cost.dollar.per.ml.mar"
+"temporary.storage.cost";"";"";"";"";"";"";"";"";"";"";" basin.cost.temp.storage.per.ml*asr.capacity.ml";"asr.cost.temp.storage.per.ml * asr.capacity.ml"
+"total.contrib.farm.income";"";"";"";"";"";"";"";"";"";"c(cotton=56.9188118961194,faba.bean=28.4027025937631,cultivated.dryland=14.6784855101176)/100";"c(cotton=56.9188118961194,faba.bean=28.4027025937631,cultivated.dryland=14.6784855101176)/100";"c(cotton=56.9188118961194,faba.bean=28.4027025937631,cultivated.dryland=14.6784855101176)/100"
+"total.farm.gross.margin";"";"";"";"";"";"";"";"";"";"land.used.ha*gross.margin.per.ha";"land.used.ha*gross.margin.per.ha";"land.used.ha*gross.margin.per.ha"
+"total.land.used";"";"";"";"";"";"";"";"";"";"net.water.available/as.numeric(crop.water.requirement.ml.per.ha[""faba.bean""]+crop.water.requirement.ml.per.ha[""cotton""])";"net.water.available/as.numeric(crop.water.requirement.ml.per.ha[""faba.bean""]+crop.water.requirement.ml.per.ha[""cotton""])";"net.water.available/(crop.water.requirement.ml.per.ha[""faba.bean""]+crop.water.requirement.ml.per.ha[""cotton""])"
+"total.overhead.cost";"";"";"";"";"";"";"";"";"";"173066";"173066";"173066"
+"total.surface.water";"";"";"";"";"";"";"";"";"";"sum(water.available[c(""surface.regular.license.ml"",""supplementary"")])";"sum(water.available[c(""surface.regular.license.ml"",""supplementary"")])";"sum(water.available[c(""surface.regular.license.ml"",""supplementary"")])"
+"variable.cost.per.ha";"";"";"";"";"";"";"";"";"";"c(
+ cotton=2505+153.1, faba.bean=565,
+ cultivated.dryland=224.6
+)";"c(
+ cotton=2505+153.1, 
+ faba.bean=565,
+ cultivated.dryland=224.6
+)";"c(
+ cotton=2505+153.1, 
+ faba.bean=565,
+ cultivated.dryland=224.6
+)"
+"water.applied.ml";"";"";"";"";"";"";"";"";"";"crop.water.requirement.ml.per.ha*land.used.ha";"crop.water.requirement.ml.per.ha*land.used.ha";"crop.water.requirement.ml.per.ha*land.used.ha"
+"water.available";"";"";"";"";"";"";"";"";"";"c( surface.regular.license.ml=400, supplementary=water.available.supplementary, groundwater=750)";"c( surface.regular.license.ml=400, supplementary=water.available.supplementary, groundwater=750)";"c( surface.regular.license.ml=400, supplementary=water.available.supplementary, groundwater=750)"
+"yield.per.ha";"";"";"";"";"";"";"";"";"";"c(
+ cotton=9.5,
+ faba.bean=5,
+ cultivated.dryland=(1.4+1.8)/2
+)";"c(
+ cotton=9.5,
+ faba.bean=5,
+ cultivated.dryland=(1.4+1.8)/2
+)";"c(
+ cotton=9.5,
+ faba.bean=5,
+ cultivated.dryland=(1.4+1.8)/2
+)"
+"annualised.capital.cost";"";"";"";"";"";"";"";"";"";"function(C,r,t){annuity.factor = (1-1/(1+r)^t)/r;C/annuity.factor}";"function(C,r,t){annuity.factor = (1-1/(1+r)^t)/r;C/annuity.factor}";"function(C,r,t){annuity.factor = (1-1/(1+r)^t)/r;C/annuity.factor}"
+"water.available.supplementary";"0";"0";"200";"800";"800";"";"";"";"";"200";"200";"200"
