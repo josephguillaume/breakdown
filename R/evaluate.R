@@ -1,3 +1,4 @@
+## equations is a named vector
 evaluate <-function(expr,equations) {
     for(n in names(equations))
         do.call(delayedAssign,

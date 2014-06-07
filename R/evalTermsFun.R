@@ -19,7 +19,7 @@ evalTermsFun <- function(equations,var,subset.args=TRUE){
     if(length(top)==0) return(NULL)
     else return(c(
       getParse(equations[!names(equations) %in% top]),
-      sprintf("%s <- %s",top,equations[top])
+      sprintf("if(is.null(%s)) %s <- %s",top,top,equations[top])
     ))
   }
   ## Only equations necessary to calculate var
@@ -28,16 +28,20 @@ evalTermsFun <- function(equations,var,subset.args=TRUE){
   ## Get ordered expressions, removing later duplicates
   code <- getParse(equations)
   code <- code[!duplicated(code)]
-  ## Treat numerical variables as arguments to the function instead
+  ## Treat numerical variables as arguments to the function only
   bottom <- getBottom(equations)
-  code <- code[!code %in% sprintf("%s <- %s",bottom,equations[bottom])]
+  code <- code[!code %in% sprintf("if(is.null(%s)) %s <- %s",bottom,bottom,equations[bottom])]
   args <- equations[bottom]
   args <- sapply(args,function(x) paste(deparse(parse(text=x),control=NULL),collapse=""))
   ## TODO: seems a bit of a hack
   args <- gsub("expression\\((.*)\\)","\\1",args)
+  other <- setdiff(names(equations),bottom)
   ## Create function as text
   code <- c(sprintf("function(%s){",
-                    paste(sprintf("%s=%s",names(args),args),collapse=",")),
+                    paste(sprintf("%s=%s",
+                                  c(names(args),other),
+                                  c(args,rep("NULL",length(other)))),
+                                  collapse=",")),
             code,
             sprintf("return(%s)}",var)
   )
