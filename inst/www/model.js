@@ -910,8 +910,10 @@ addScens=function(model,scen_vals){
 	}});
 };
 
-loadDemo=function(model){
-	var req=ocpu.rpc("getCombinedCSV",{},function(data){ 
+loadDemo=function(model,url){
+	opts={};
+	if(!url) opts={url:url}
+	var req=ocpu.rpc("getCombinedCSV",opts,function(data){ 
 		console.log('loadDemo');
 		model.AllFromCSV(data);
 	})

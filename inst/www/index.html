@@ -156,7 +156,7 @@
 		<div title="Load" style="padding:20px">
 			
 			<div class="easyui-panel" style="padding:5px;">
-				<a href="#" class="easyui-linkbutton" onclick='$("csvEquationsInput").click()' data-options='plain:true,iconCls:"icon-tip"'>Load demo</a>
+				<a href="#" class="easyui-linkbutton" onclick='loadDemo(analysis)' data-options='plain:true,iconCls:"icon-tip"'>Load demo</a>
 				<span class="button-sep"></span>
 				<a href="#" class="easyui-linkbutton" onclick='$("#csvAllInput").click()' data-options='plain:true,iconCls:"icon-add"'>Load combined CSV</a>
 				<input type="file" id="csvAllInput" onchange="readCsv(this.files,function(x){analysis.AllFromCSV(x)},';')" accept=".csv" style="display:none">
