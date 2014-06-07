@@ -5,7 +5,6 @@
 ## scens - vector of scenario names to use in plot
 ## NPV - function to evaluate
 plotNPV<-function(equations,x,y,ranges0,scens){
-  equations <- getSubset(equations,y)
   fs=evalTermsFun(equations,y,subset.args=FALSE)
   ## Use a list even for a single function
   if(is.function(fs)) fs=list(fs)
