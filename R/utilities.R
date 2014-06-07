@@ -39,6 +39,7 @@ getSubset <- function(equations,var){
     if(!var %in% equations[,1]) return(NULL)
     row=equations[equations[,1]==var,,drop=FALSE]
     children <- getTerms(row[-1],functions=TRUE)
+    if(row[,1] %in% children) stop(sprintf("%s is its own child",row[,1]))
     return(unique(do.call(rbind,c(
       list(row),
       lapply(children,function(x) getSubset(equations,x))
