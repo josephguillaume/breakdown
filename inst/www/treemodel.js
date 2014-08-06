@@ -18,7 +18,6 @@ $.extend($.fn.treegrid.methods, {
 	}
 });
 
-//TODO: http://www.jeasyui.com/forum/index.php?topic=2307.0
 promptEquation = function(model,row,field){
 	if(field=="name") return false; //TODO: allow editing variable name
 	var data=model.get('equations').map(function(arr){return arr.slice();});
@@ -36,6 +35,26 @@ promptEquation = function(model,row,field){
 	}
 }
 
+//http://www.jeasyui.com/forum/index.php?topic=2307.0
+//TODO: resizable
+promptEquation_messager = function(model,row,field){
+	if(field=="name") return false; //TODO: allow editing variable name
+	var data=model.get('equations').map(function(arr){return arr.slice();});
+	var names=data.map(function(x){return x[0]});
+	var index=names.indexOf(row.name);
+	var scens=model.get("scens");
+	var col=parseInt(field.replace("scen",""))-1
+	var equation=data[index][scens[col]]
+	var header=model.get("header");
+	$.messager.prompt('Edit '+header[scens[col]], "Equation/value for '"+row.name+"'", function(newequation) {
+		if(newequation) {
+			data[index][scens[col]]=newequation;
+			console.log(data);
+			model.set('equations',data);
+		}
+	});
+    $('.messager-input').val(equation).focus();
+}
 
 var TreeView = Backbone.View.extend({
 	//model is an Analysis
