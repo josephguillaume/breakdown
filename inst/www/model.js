@@ -27,7 +27,6 @@ var Analysis = Backbone.Model.extend({
 		equations: [],
 		header:["Variable"],
 		ranges:[],
-		univariate_crossover:[],
 		scens:[1,2],
 		selected_var1: null,
 		ranges_cols:["Variable","Lower","Min","Best","Max","Upper"],
@@ -171,38 +170,6 @@ var Analysis = Backbone.Model.extend({
 		});
 		return this;
 	},
-	univariateCrossover:function(output){
-		var model=this;
-		if(model.get('ranges').length==0) return(this);
-		var ranges= {
-			Variable:model.get('ranges').map(function(x){return x[0]}),
-			Lower:model.get('ranges').map(function(x){return parseFloat(x[1])}),
-			Upper:model.get('ranges').map(function(x){return parseFloat(x[5])})
-		};
-		
-		console.log("univariateCrossover");
-		var req=ocpu.rpc("univariateCrossover",{
-				'equations.scen':model.selectEqns([model.get('scens')[0]]),
-				'equations.baseline':model.selectEqns([model.get('scens')[1]]),
-				'var':output,
-				ranges:ranges
-			},function(data){
-				//TODO: cannot store results for more than one output
-				model.set('univariate_crossover',data);
-			})
-		req.fail(function(){
-			$.messager.show({
-					title:'Error',
-					msg:req.responseText,
-					timeout:5000,
-					showType:'slide'
-					});
-			model.set('univariate_crossover',[]);
-		});
-	}
-	//bivariate
-	//equiconcern
-	//staged SCE
 }); 
 
 var SingleOutputPlot = Backbone.View.extend({

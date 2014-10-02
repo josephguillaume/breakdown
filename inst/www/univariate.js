@@ -1,38 +1,75 @@
+var UnivariateAnalysis = Backbone.Model.extend({
+	defaults: {
+		vars:[],
+		output:null,
+		base:null,
+		univariate_crossover:[]
+	},
+	initialize:function(){
+		//univariateCrossover is called if any of the attributes change
+		this.on('change:output',this.univariateCrossover,this);
+		this.listenTo(this.get("base"),'change:ranges', this.univariateCrossover, this);
+		this.listenTo(this.get("base"),'change:equations', this.univariateCrossover, this);
+		this.listenTo(this.get("base"),'change:scens',this.univariateCrossover,this);
+	},
+	univariateCrossover:function(){
+		var model=this;
+		var base=model.get("base");
+		if(base.get('ranges').length==0) return(this);
+		var ranges= {
+			Variable:base.get('ranges').map(function(x){return x[0]}),
+			Lower:base.get('ranges').map(function(x){return parseFloat(x[1])}),
+			Upper:base.get('ranges').map(function(x){return parseFloat(x[5])})
+		};
+		
+		console.log("univariateCrossover");
+		var req=ocpu.rpc("univariateCrossover",{
+				'equations.scen':base.selectEqns([base.get('scens')[0]]),
+				'equations.baseline':base.selectEqns([base.get('scens')[1]]),
+				'var':model.get('output'),
+				ranges:ranges
+			},function(data){
+				//TODO: cannot store results for more than one output
+				model.set('univariate_crossover',data);
+			})
+		req.fail(function(){
+			$.messager.show({
+					title:'Error',
+					msg:req.responseText,
+					timeout:5000,
+					showType:'slide'
+					});
+			model.set('univariate_crossover',[]);
+		});
+	}
+});
+
 //UnivariateTable: name, slider, levels of comfort, crossover point
 //model: ranges, equations, scens, selected_var1, univariate_crossover
 
 var UnivariateTable = Backbone.View.extend({
-    initialize: function(args,output){
-		this.output=args.output;
-		
-		this.uniSliders=new RangeSliders({model:this.model,el:this.$el,editRange:editRange_placeholder});
+    initialize: function(){
+		this.uniSliders=new RangeSliders({model:this.model.get("base"),el:this.$el,editRange:editRange_placeholder});
 		//uniSliders will be updated on render here instead
 		this.uniSliders.stopListening();
 		
-		this.listenTo(this.model,'change:ranges', this.calc, this);
-		this.listenTo(this.model,'change:equations', this.calc, this);
-		this.listenTo(this.model,'change:scens',this.calc,this);
-		this.listenTo(this.model,'change:selected_var1',this.setselected,this);
+		this.listenTo(this.model.get("base"),'change:selected_var1',this.setselected,this);
+		this.listenTo(this.model.get("base"),'change:ranges', this.render, this);
 		this.listenTo(this.model,'change:univariate_crossover', this.render, this);
-		this.listenTo(this.model,'change:ranges', this.render, this);
 		this.render();
 	},
-	calc:function(){
-		//async change to model, so render called on change:univariate_crossover
-		this.model.univariateCrossover(this.output);
-		return this;
-	},
 	setselected:function(){
-		this.$el.find('input[name="selectedVar"][value="' + this.model.get('selected_var1') + '"]').prop('checked', true);
+		this.$el.find('input[name="selectedVar"][value="' + this.model.get('base').get('selected_var1') + '"]').prop('checked', true);
 	},
     render: function() {
 		console.log("render UnivariateTable "+this.output);
 		var model=this.model;
-		data=model.get('univariate_crossover');
+		var base=model.get('base');
+		data=model.get('univariate_crossover').slice();
 		// Calculate data
-		var tab=$.map(model.get('ranges'),function(e,i){
-			var perc_to_limit=model.normalise(data[i],e[0]);
-			var best = model.get('ranges')[i][3];
+		var tab=$.map(base.get('ranges'),function(e,i){
+			var perc_to_limit=base.normalise(data[i],e[0]);
+			var best = base.get('ranges')[i][3];
 			var perc_change=null;
 			if(best && data[i]) perc_change=(data[i]-best)/best*100;
 			var concernClass=null;
@@ -48,7 +85,7 @@ var UnivariateTable = Backbone.View.extend({
 			id:this.$el.prop("id")
 		}));
 		this.uniSliders.render();
-		this.$el.find("input:radio").on('change',function(){model.set('selected_var1',this.value)});
+		this.$el.find("input:radio").on('change',function(){base.set('selected_var1',this.value)});
 		this.setselected();
 		return this;
 	}
