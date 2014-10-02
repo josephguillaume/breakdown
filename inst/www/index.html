@@ -139,7 +139,7 @@
 			<h1>Breakdown analysis</h1>
 	</div>
 		
-	<div id="tabs" data-options="region:'center',plain:true,tabPosition:'left',headerWidth:170" class="easyui-tabs">	
+	<div id="tabs" data-options="region:'center',plain:true,tabPosition:'left',headerWidth:170,onSelect:tabs_handle_render" class="easyui-tabs">	
 		<style>
 			.l-btn{
 				vertical-align:middle;
@@ -284,6 +284,12 @@
 							});
 		var selectBase = new SelectScens({model:analysis,el:$('#select_base'),wscen:0});
 		var selectScen = new SelectScens({model:analysis,el:$('#select_scen'),wscen:1});
+		
+		tabs_handle_render = function(title,idx){
+			//console.log(title+' '+idx)
+			if(idx==4) singleOutputPlot.render();
+			
+		}
 	</script>
 	
 	

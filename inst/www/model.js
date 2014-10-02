@@ -174,15 +174,18 @@ var Analysis = Backbone.Model.extend({
 
 var SingleOutputPlot = Backbone.View.extend({
 	initialize: function(args){
+		this.dirty = true;
 		this.output=args.output;
-		this.model.on('change:ranges', this.render, this);
-		this.model.on('change:equations', this.render, this);
-		this.model.on('change:selected_var1',this.render,this);
-		this.model.on('change:scens',this.render,this);
+		this.model.on('change:ranges', this.actual_render, this);
+		this.model.on('change:equations', this.actual_render, this);
+		this.model.on('change:selected_var1',this.actual_render,this);
+		this.model.on('change:scens',this.actual_render,this);
 		var obj=this;
-		this.$el.resizable({onStopResize:function(){obj.render()}});
+		this.$el.resizable({onStopResize:function(){obj.actual_render()}});
 	},
 	render:function(){
+		if(!this.$el.is(":visible")) return this;
+		if(!this.dirty) return this; //don't rerun unless plot actually needs to change
 		console.log("render SingleOutputPlot");
 		var model=this.model;
 		if(!model || !model.get("selected_var1")) return(this);
@@ -197,13 +200,21 @@ var SingleOutputPlot = Backbone.View.extend({
 			return(this);
 		}
 		ranges0=_.object(model.get("ranges_cols"),ranges0[0]);
-		this.$el.rplot("plotNPV",{					
+		var req = this.$el.rplot("plotNPV",{					
 					equations:model.selectEqns(model.get('scens')),
 					x:model.get("selected_var1"),y:this.output,
 					ranges0:ranges0,
 					scens:model.get("scens").map(function(i){return model.get('header')[i]})
-				})
+				});
+		var view=this;
+		req.done(function(){
+			view.dirty=false;
+		});
 		return this;
+	},
+	actual_render:function(){
+		this.dirty=true;
+		this.render();
 	}
 });
 
