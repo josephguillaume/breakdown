@@ -293,6 +293,16 @@
 			
 			if(idx==5) bivOutputPlot.render();
 		}
+		
+		//wrapper function to change variable for all the analyses
+		// in principle analyses could use different variables
+		setOutputVar = function(varname){
+			singleOutputPlot.output=varname;
+			singleOutputPlot.actual_render();
+			univ.set('output',varname);
+			biv.set('output',varname);
+			mult.set('output',varname);
+		}
 	</script>
 	
 	
