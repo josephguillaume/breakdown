@@ -78,6 +78,7 @@ var MultivarCheckboxTable = Backbone.View.extend({
 var MultivarResultsTable = Backbone.View.extend({
 	//model is a MultivarCrossover
     initialize: function(args){
+		this.univariate=args.univariate;
 		this.template=_.template(args.template.html());
 		this.listenTo(this.model.get("base"),'change:univariate_crossover',this.render,this);
 		this.listenTo(this.model,'change:multivar_result',this.render,this);
@@ -92,7 +93,7 @@ var MultivarResultsTable = Backbone.View.extend({
 		//TODO: more efficient way of subsetting univar
 		var variables=model.get("base").get('ranges').map(function(x){return x[0]});
 		var varIdx=model.get("vars").map(function(v){return variables.indexOf(v)});
-		var univar=model.get("base").get("univariate_crossover");
+		var univar=this.univariate.get("univariate_crossover");
 		var results={
 			Variable:model.get("vars"),
 			univar:varIdx.map(function(i){return univar[i]}),

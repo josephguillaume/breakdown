@@ -273,11 +273,13 @@
 		$("#bi_n").slider({from:0,to:400,scale:[0,'|',100,'|',200,'|',300,'|',400],limits:false,
 					callback:function(v){biv.set('n',parseInt(v))}
 					});
+					
 		var mult= new MultivarCrossover({base:analysis,output:'NPV'});
 		var multCheck = new MultivarCheckboxTable({model:mult,el:$("#mult_table"),template:$("#MultiVarRB_template")});
-		var multOut= new MultivarResultsTable({model:mult,el:$("#mult_output"),template:$("#MultiVarResultsTable_template")});
 		ocpu.seturl("/breakdown/R")
 		//ocpu.seturl("http://josephguillaume.ocpu.io/breakdown/R")
+		var multOut= new MultivarResultsTable({model:mult,univariate:univ,el:$("#mult_output"),template:$("#MultiVarResultsTable_template")});
+		
 		var treeView = new TreeView({
 							model: analysis,
 							el: $("#tt") 
