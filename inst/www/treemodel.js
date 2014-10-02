@@ -18,6 +18,44 @@ $.extend($.fn.treegrid.methods, {
 	}
 });
 
+promptEquation = function(model,row,field){
+	if(field=="name") return false; //TODO: allow editing variable name
+	var data=model.get('equations').map(function(arr){return arr.slice();});
+	var names=data.map(function(x){return x[0]});
+	var index=names.indexOf(row.name);
+	var scens=model.get("scens");
+	var col=parseInt(field.replace("scen",""))-1
+	var equation=data[index][scens[col]]
+	var header=model.get("header");
+	var newequation=prompt("Equation/value for '"+row.name+"' ("+header[scens[col]]+")",equation);
+    if(newequation) {
+		data[index][scens[col]]=newequation;
+		console.log(data);
+		model.set('equations',data);
+	}
+}
+
+//http://www.jeasyui.com/forum/index.php?topic=2307.0
+//TODO: resizable
+promptEquation_messager = function(model,row,field){
+	if(field=="name") return false; //TODO: allow editing variable name
+	var data=model.get('equations').map(function(arr){return arr.slice();});
+	var names=data.map(function(x){return x[0]});
+	var index=names.indexOf(row.name);
+	var scens=model.get("scens");
+	var col=parseInt(field.replace("scen",""))-1
+	var equation=data[index][scens[col]]
+	var header=model.get("header");
+	$.messager.prompt('Edit '+header[scens[col]], "Equation/value for '"+row.name+"'", function(newequation) {
+		if(newequation) {
+			data[index][scens[col]]=newequation;
+			console.log(data);
+			model.set('equations',data);
+		}
+	});
+    $('.messager-input').val(equation).focus();
+}
+
 var TreeView = Backbone.View.extend({
 	//model is an Analysis
 	initialize: function(){
@@ -79,7 +117,10 @@ var TreeView = Backbone.View.extend({
 				delete model.get("expanded")[row.id]
 			},
 			onDblClickCell: function(field,row){
-				if(!model.get('showEquation')) return false;
+				if(!model.get('showEquation')) {
+					promptEquation(model,row,field);
+					return false;
+				}
 				var dg=$(this);
 				var index=row.id;
 				dg.treegrid('editCell', {index:index,field:field});
