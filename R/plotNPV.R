@@ -1,9 +1,8 @@
 ## equations - matrix with first column as variable
-## y - dependent variable
 ## x - independent variable
+## y - dependent variable
 ## ranges0 - list with variables Min,Max
 ## scens - vector of scenario names to use in plot
-## NPV - function to evaluate
 plotNPV<-function(equations,x,y,ranges0,scens){
   fs=evalTermsFun(equations,y,subset.args=FALSE)
   ## Use a list even for a single function
@@ -15,7 +14,7 @@ plotNPV<-function(equations,x,y,ranges0,scens){
   geom_vline(aes(xintercept={MODELED},linetype='Best guess',size='Best guess',colour='Best guess',show_guide=TRUE))+
   geom_hline(aes(yintercept=0),colour='grey',size=1,linetype='solid')+
   scale_x_continuous(name=x,limits=range(c({LOWER},{UPPER})))+
-  scale_y_continuous(name='NPV')+
+  scale_y_continuous(name='{YVAR}')+
   scale_linetype_manual(name='Lines',values=c('Limits'='solid','Best guess'='dashed',{LINETYPE}),
   limits=c('Best guess','Limits',{SCENS}))+
   scale_size_manual(name='Lines',values=c('Limits'=0.5,'Best guess'=0.5,{SIZE}),
@@ -27,6 +26,7 @@ plotNPV<-function(equations,x,y,ranges0,scens){
   tpl=gsub("{MODELED}",ranges0[["Best"]],tpl,fixed=TRUE)
   tpl=gsub("{LOWER}",ranges0[["Lower"]],tpl,fixed=TRUE)
   tpl=gsub("{UPPER}",ranges0[["Upper"]],tpl,fixed=TRUE)
+  tpl=gsub("{YVAR}",y,tpl,fixed=TRUE)
   if(!is.null(ranges0[["Min"]]) && !is.null(ranges0[["Max"]])){
     tpl=paste(tpl,"+geom_vline(aes(xintercept=c({MIN},{MAX}),linetype='Limits',size='Limits',colour='Limits'))")
     tpl=gsub("{MIN}",ranges0[["Min"]],tpl,fixed=TRUE)
