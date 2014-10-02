@@ -37,14 +37,16 @@ var BivariateAnalysis = Backbone.Model.extend({
 
 var BivOutputPlot = Backbone.View.extend({
     initialize: function(args){
-
-		this.listenTo(this.model,'change:bivariate_result', this.render, this);
-		this.listenTo(this.model,'change:flip', this.render, this);
+		this.dirty=true;
+		this.listenTo(this.model,'change:bivariate_result', this.actual_render, this);
+		this.listenTo(this.model,'change:flip', this.actual_render, this);
 		//TODO: changing Min,Max,Best should just involve new plot
 		var obj=this;
-		this.$el.resizable({onStopResize:function(){obj.render()}});
+		this.$el.resizable({onStopResize:function(){obj.actual_render()}});
 	},
     render: function() {
+		if(!this.$el.is(":visible")) return this;
+		if(!this.dirty) return this; //don't rerun unless plot actually needs to change
 		var pom=this.model.get("bivariate_result");
 		if(!pom) return this;
 		console.log("BivOutputPlot render");
@@ -55,7 +57,15 @@ var BivOutputPlot = Backbone.View.extend({
 					flip:this.model.get("flip")
 		})
 		req.fail(function(){console.log(req.responseText)});
+		var view=this;
+		req.done(function(){
+			view.dirty=false;
+		});
 		return this;
+	},
+	actual_render:function(){
+		this.dirty=true;
+		this.render();
 	}
 });
 
