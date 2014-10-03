@@ -444,3 +444,37 @@ loadDemo=function(model,url){
 		model.AllFromCSV(data);
 	})
 }
+
+
+var EditableNote = Backbone.View.extend({
+	//model is an Analysis
+	initialize: function(args){
+		this.field=args.field;
+		this.listenTo(this.model,'change:selected_var1',this.render,this);
+		//TODO: only re-render if current variable changes
+		this.listenTo(this.model.get('notes'),'change:'+this.field,this.render,this);
+		var view=this;
+		this.$el.editable({
+			type: 'textarea',
+			emptytext: 'Click here to add comment',
+			mode:'inline',
+			showbuttons:'bottom',
+			unsavedclass:null, //TODO: persistent storage of notes other than by export to csv
+		    success: function(response, newValue) {
+				console.log('EditableNote setting '+view.model.get('selected_var1')+'.'+view.field);
+				view.model.get('notes').get(view.model.get('selected_var1')).set(view.field,newValue);
+			}
+		});
+		this.render();
+	},
+	render: function(){
+		if(this.model.get('selected_var1')==null){
+			this.$el.editable('disable');
+			return this
+		} else {
+			this.$el.editable('enable');
+		}
+		this.$el.editable('setValue',this.model.get('notes').get(this.model.get('selected_var1')).get(this.field));
+		return this;
+	}
+});
