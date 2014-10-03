@@ -22,8 +22,24 @@ readCsv = function(files,handler,separator){
     }
 }
 
+var Note = Backbone.Model.extend({
+	defaults:{
+		id:null,
+		bestguess:null,
+		bounds:null,
+		direction:null,
+		is_problem:null
+	}
+});
+
+var Notes = Backbone.Collection.extend({
+	model:Note,
+	comparator:'id'
+});
+
 var Analysis = Backbone.Model.extend({
 	defaults: {
+		notes:new Notes(),
 		equations: [],
 		header:["Variable"],
 		ranges:[],
@@ -61,6 +77,19 @@ var Analysis = Backbone.Model.extend({
 		//remove empty rows
 		ranges=ranges.filter(function(v,i){return v[1]!=""|v[2]!=""|v[3]!=""|v[4]!=""|v[5]!=""});
 		this.set('ranges',ranges);
+		// Notes
+		notes=this.get('notes');
+		csv.map(function(x){
+			if(x[0]=="Variable") return false;
+			notes.add({
+				id:x[0],
+				bestguess:x[6],
+				bounds:x[7],
+				direction:x[8],
+				is_problem:x[9]
+			});
+		});
+		notes.sort();
 		return this;
 	},
 	AllToCSV:function(){
