@@ -118,9 +118,9 @@
 				<th>Variable</th>
 				<th>Min</th>
 				<th>Max</th>
-				<th>Single variable<br/>breakpoint</th>
+				<th>Single variable<br/>cross-over point</th>
 				<th>Best guess</th>
-				<th>Many variable<br/>breakpoint</th>
+				<th>Many variable<br/>cross-over point</th>
 				<th>Change</th>
 				<th title="% distance from bound">Level of concern</th>
 			</thead>
@@ -250,7 +250,7 @@
 			</div>
 		</div></div>	
 
-		<div title="Single variable breakpoints" id="tab_univ"><div class="easyui-layout" data-options="fit:true">		
+		<div title="Single variable cross-over points" id="tab_univ"><div class="easyui-layout" data-options="fit:true">		
 			<div data-options="region:'center'" style="padding:10px;">
 				<div>
 					<h2>How much does a single variable need to change to reach a crossover point?</h2>
@@ -295,7 +295,7 @@
 		<style>
 		#bi_n + .slider {display:inline-block;margin-left:10px;margin-right:10px}
 		</style>
-		<div title="Two variable breakpoints" style="padding:10px"><div class='easyui-layout' data-options="fit:true">
+		<div title="Two variable cross-over points" style="padding:10px"><div class='easyui-layout' data-options="fit:true">
 			<div data-options="region:'center'" style="padding:10px;" id="biv_table"></div>
 			<div data-options="region:'east',split:true,collapsible:true" style="width:500px;padding:10px">
 				<div id="biplot" class="easyui-resizable" data-options="maxWidth:2048,maxHeight:1536" style="border: 1px solid rgb(204, 204, 204);width:400px;height:250px"></div>
@@ -307,10 +307,10 @@
 			</div>
 		</div></div>
 		
-		<div title="Many-variable breakpoints"><div class='easyui-layout' data-options="fit:true">
+		<div title="Many-variable cross-over points"><div class='easyui-layout' data-options="fit:true">
 			<div data-options="region:'center'" style="padding:10px;" id="mult_table"></div>
 			<div data-options="region:'east',split:true,collapsible:true" style="width:500px;padding:10px">
-				<a href="#" class="easyui-linkbutton" onclick='mult.crossoverEquiconcern()'>Update many-variable breakpoints</a><br/>
+				<a href="#" class="easyui-linkbutton" onclick='mult.crossoverEquiconcern()'>Update many-variable cross-over points</a><br/>
 				<div id='mult_output'></div>
 			</div>
 		</div></div>
