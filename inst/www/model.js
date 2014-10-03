@@ -447,6 +447,46 @@ addScens=function(model,scen_vals){
 	}});
 };
 
+var SelectOutput = Backbone.View.extend({
+	//model is an Analysis
+    initialize: function(args){
+		this.listenTo(this.model,"change:equations",this.render);
+		this.listenTo(this.model,"change:output_var",this.render);
+		this.render();
+	},
+	render: function(){
+		var model=this.model;
+		var view=this;
+		var opts=model.get('equations').map(function(x){return {text:x[0]}})
+		if(opts.length==0) opts=[{text:""}];
+		this.$el.combobox({
+			valueField:'text',
+			textField:'text',
+			selectOnNavigation:true,
+			data:opts,
+			onChange:function(oldval,newval){
+				if(oldval==newval) return null;
+				if(newval=="") return null;
+				if(!newval) return null;
+				var idx=model.get('equations').map(function(x){return x[0]}).indexOf(newval);
+				if(idx>0){
+					view.$el.next().find("input").toggleClass("unknown-scen",false);
+					model.set('output_var',newval);
+				} else {
+					view.$el.next().find("input").toggleClass("unknown-scen",true);
+				}
+			},
+			onSelect:function(rec){
+				if(!rec) return null;
+				view.$el.next().find("input").toggleClass("unknown-scen",false);
+				model.set('output_var',rec.text);
+			}
+		});
+		this.$el.combobox('select',model.get('output_var'));
+	}
+});
+
+
 loadDemo=function(model,url){
 	opts={};
 	if(!url) opts={url:url}
