@@ -77,6 +77,7 @@ var Analysis = Backbone.Model.extend({
 		//remove empty rows
 		ranges=ranges.filter(function(v,i){return v[1]!=""|v[2]!=""|v[3]!=""|v[4]!=""|v[5]!=""});
 		this.set('ranges',ranges);
+		if(this.get('selected_var1')==null) this.set('selected_var1',ranges[0][0]);
 		// Notes
 		notes=this.get('notes');
 		csv.map(function(x){
