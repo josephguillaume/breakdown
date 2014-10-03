@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Breakdown analysis</title>
+	<link rel="stylesheet" type="text/css" href="js/themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="js/themes/icon.css">
+	<link rel="stylesheet" type="text/css" href="js/jquery.slider.min.css">
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="js/jquery.slider.min.js"></script>
+	<!-- note all sliders are http://egorkhmelev.github.io/jslider/ not jeasyui -->
+	<script type="text/javascript" src="js/underscore.1.6.0.min.js"></script>
+	<script type="text/javascript" src="js/backbone.1.1.2.min.js"></script>
+	<script type="text/javascript" src="js/jquery.csv-0.71.min.js"></script>
+	<script type="text/javascript" src="js/opencpu-0.5.js"></script>
+	
+	<style>
+	.highconcern {color:red}
+	.midconcern {color:orange}
+	.lowconcern {color:green}
+	#univariate>table>tbody>tr{
+		border-bottom-style: solid;
+		border-bottom-width: 1px;
+		border-bottom-color: grey;
+		text-align:right;
+	}
+	.jslider{display:inline-block;width:150px;margin-bottom:20px;margin-top:15px;margin-left:7px;margin-right:7px}
+	</style>
+
+</head>
+<body class="easyui-layout">
+
+	<script type="text/template" id="outputstats_template">
+		<%-variable%> of <%- baseline %>: $<% print((baseline_value).toFixed(2)) %><br/>
+		<%-variable%> of <%- scen %>: $<% print((scen_value).toFixed(2)) %><br/>
+		difference: $<% print((scen_value-baseline_value).toFixed(2)) %>	
+	</script>
+	
+	<script type="text/template" id="univTable_template">
+		<form><table>
+			<thead>
+			<th>Variable</th>
+			<th></th>
+			<th title="% distance from best guess">Level of comfort</th>
+			<th title="% distance from bound">Level of concern</th>
+			<th>Value at crossover point</th>
+			<th>% change of best guess</th>
+			<th>NPV</th>
+			</thead>
+			<tbody>
+			 <% _.each( tab, function( row ){ %>
+				<tr align="middle" <% if(row.concernClass){ print("class="+row.concernClass)} %>>
+					<td align="right"><%- row.Variable%></td>
+					<td><input id="<%-id%>_<%-row.Variable%>" value="<%-row.Lower%>;<%-row.Upper%>" type="slider"/></td>
+					<td><% if(row.PercToLimit && !isNaN(parseFloat(row.PercToLimit))){ print((row.PercToLimit*100).toFixed(1)+"%")} %></td>
+					<td><% if(row.PercToLimit && !isNaN(parseFloat(row.PercToLimit))){ print(((1-row.PercToLimit)*100).toFixed(1)+"%")} %></td>
+					<td><% if(row.Break && !isNaN(parseFloat(row.Break))){print(row.Break.toFixed(4))} %></td>
+					<td><% if(row.PercChange && !isNaN(parseFloat(row.PercChange))){print(row.PercChange.toFixed(2)+"%")} %></td>
+					<td><% if(row.NPV){print(row.NPV)} %></td>
+					<td><input type="radio" name="selectedVar" value="<%- row.Variable %>"></td>
+				</tr>
+			  <% }); %>
+			</tbody>
+		</table></form>
+	</script>
+	
+	<script type="text/template" id="BivariateRadioButtonTable_template">
+		<table>
+			<thead>
+				<th>Variable</th>
+				<th></th>
+				<th>Var 1</th>
+				<th>Var 2</th>
+			</thead>
+			<tbody>
+				<% _.each( ranges, function( row ){ %>
+				<tr valign='middle'>
+					<td style='text-align:right'><%print(row[0])%></td>
+					<td><input id="<%-id%>_<%print(row[0])%>" value="<%print(row[1])%>;<%print(row[5])%>" type="slider"/></td>
+					<td style='text-align:center'><input type = "radio" name="<%-inputId%>" value=<%print(row[0])%>></td>
+					<td style='text-align:center'><input type = "radio" name="<%-inputId2%>" value=<%print(row[0])%>></td>
+				</tr>
+				<% }); %>
+			</tbody>
+		</table>
+	</script>
+	
+	<script type="text/template" id="MultiVarRB_template">
+		<table>
+			<thead>
+				<th>Variable</th>
+				<th></th>
+				<th>Vary?</th>
+			</thead>
+			<tbody>
+				<% _.each( ranges, function( row ){ %>
+				<tr valign='middle'>
+					<td style='text-align:right'><%print(row[0])%></td>
+					<td><input id="<%-id%>_<%print(row[0])%>" value="<%print(row[1])%>;<%print(row[5])%>" type="slider"/></td>
+					<td style='text-align:center'><input type = "checkbox" name="<%-inputId%>" value=<%print(row[0])%>></td>
+				</tr>
+				<% }); %>
+			</tbody>
+		</table>
+	</script>
+	
+	<script type="text/template" id="MultiVarResultsTable_template">
+		<table>
+			<thead>
+				<th>Variable</th>
+				<th>Min</th>
+				<th>Max</th>
+				<th>Single variable<br/>breakpoint</th>
+				<th>Best guess</th>
+				<th>Many variable<br/>breakpoint</th>
+				<th>Change</th>
+				<th title="% distance from bound">Level of concern</th>
+			</thead>
+			<tbody>
+				<% _.each( results, function( row ){ %>
+				<tr>
+					<td><%-row.Variable%></td>
+					<!-- TODO: neater robust number formatting -->
+					<td align='right'><% if(!isNaN(parseFloat(row.Min))){ print(parseFloat(row.Min).toFixed(2))}%></td>
+					<td align='right'><% if(!isNaN(parseFloat(row.Max))){ print(parseFloat(row.Max).toFixed(2))}%></td>
+					<td align='right'><% if(!isNaN(parseFloat(row.univar))){ print(parseFloat(row.univar).toFixed(2))}%></td>
+					<td align='right'><% if(!isNaN(parseFloat(row.Best))){ print(parseFloat(row.Best).toFixed(2))}%></td>
+					<td align='right'><% if(!isNaN(parseFloat(row.multvar))){ print(parseFloat(row.multvar).toFixed(2))}%></td>
+					<td align='right'><% if(!isNaN(parseFloat(row.change))){ print(parseFloat(row.change).toFixed(2))}%></td>
+					<td align='right'><% if(!isNaN(parseFloat(loc))){ print(parseFloat(loc).toFixed(2))}%></td>
+				</tr>
+				<% }); %>
+			</tbody>
+		</table>
+	</script>
+
+	<div data-options="region:'north'" style="height:70px;padding:5px">
+			<h1>Breakdown analysis</h1>
+	</div>
+		
+	<div id="tabs" data-options="region:'center',plain:true,tabPosition:'left',headerWidth:170,onSelect:tabs_handle_render" class="easyui-tabs">	
+		<style>
+			.l-btn{
+				vertical-align:middle;
+			}
+			.button-sep{
+				display:inline-block;
+				width:0;
+				height:22px;
+				border-left:1px solid #ccc;
+				border-right:1px solid #fff;
+				vertical-align:middle;
+			}
+		</style>
+		<div title="Load" style="padding:20px">
+			
+			<div class="easyui-panel" style="padding:5px;">
+				<a href="#" class="easyui-linkbutton" onclick='loadDemo(analysis)' data-options='plain:true,iconCls:"icon-tip"'>Load demo</a>
+				<span class="button-sep"></span>
+				<a href="#" class="easyui-linkbutton" onclick='$("#csvAllInput").click()' data-options='plain:true,iconCls:"icon-add"'>Load combined CSV</a>
+				<input type="file" id="csvAllInput" onchange="readCsv(this.files,function(x){analysis.AllFromCSV(x)},';')" accept=".csv" style="display:none">
+				<span class="button-sep"></span>
+				<a href="#" class="easyui-linkbutton" onclick='$("#csvEquationsInput").click()' data-options='plain:true,iconCls:"icon-add"'>Load equations CSV</a>
+				<input type="file" id="csvEquationsInput" onchange="readCsv(this.files,function(x){analysis.EquationsfromCSV(x)})" accept=".csv" style="display:none">
+				<span class="button-sep"></span>
+				<a href="#" class="easyui-linkbutton" onclick='setDefault(analysis)' data-options='plain:true,iconCls:"icon-sum"'>Set default ranges</a>
+				<span class="button-sep"></span>
+				<a id="dl_csv" class="easyui-linkbutton" download='breakdown.csv' onclick='downloadCSV(analysis)' data-options='plain:true,iconCls:"icon-save"'>Download combined CSV</a>
+				<span class="button-sep"></span>
+			</div>
+			<h2>Load equations and ranges</h2>
+			<li>'Load equations CSV' expects a CSV with first column the name of each variable, and other columns the equation to calculate each variable</li>
+			<li>'Set default ranges' calculates default analysis bounds as 1% and 1000% of the modeled numeric values defined in the equations</li>
+			<h2>Save equations and ranges</h2>
+			<li>'Download combined csv' exports a csv that includes ranges, notes and equations for all variables</li>
+			<h2>Define settings</h2>
+			<style>
+			.unknown-scen{color:red}
+			</style>
+			<label for='select_base'>Baseline: </label><input id="select_base" name="select_base" value="">			
+			<label for='select_scen'>Scenario: </label><input id="select_scen" name="select_scen" value="">
+			<a class="easyui-linkbutton" onclick='addScens(analysis,[$("#select_base").combobox("getText"),$("#select_scen").combobox("getText")])'>Add new scenarios</a>
+		</div>
+	
+		<div title="Equations" data-options="fit:true"><div class="easyui-layout" data-options="fit:true">
+			
+			<div data-options="region:'center'">
+				<div id="eq_tb">
+					<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick='addrow($("#dg-equations"))'>Add</a>
+					<a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick='deleterow($("#dg-equations"),analysis,"equations")'>Delete</a>
+				</div>
+				<table id="dg-equations" toolbar="#eq_tb"></table>		
+			</div>
+			
+			<div id="explain" style="padding:10px;width:200px;" data-options="region:'east',split:true,collapsible:true"></div>
+
+		</div></div>	
+		
+		<div title="Equation Breakdown"><div class="easyui-layout" data-options="fit:true">
+			<div data-options="region:'north'" style="height:35px;padding:5px;border:false;collapsible:false">
+				<a href="#" class="easyui-linkbutton" onclick='analysis.set("showEquation",!analysis.get("showEquation"))'>Toggle equations</a>
+			</div>
+			<div data-options="region:'center'" class="easyui-panel" style="padding:5px">
+				<table id="tt"></table>
+			</div>
+		</div></div>	
+		
+		<div title="Variable Ranges">
+			<div id="ra_tb">
+				<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick='addrow($("#dg-ranges"))'>Add</a>
+				<a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick='deleterow($("#dg-ranges"),analysis,"ranges")'>Delete</a>
+			</div>
+			<table id="dg-ranges" toolbar="#ra_tb"></table>
+		</div>
+
+		<div title="Single variable breakpoints" id="tab_univ"><div class="easyui-layout" data-options="fit:true">		
+			<div data-options="region:'center'" style="padding:10px;">
+				<h2>How much does a single variable need to change to reach a crossover point?</h2>
+				<div id="univariate"></div>
+			</div>
+			<div data-options="region:'east',split:true,collapsible:true" style="width:500px;padding:10px">
+				<div id="singleplot" class="easyui-resizable" data-options="maxWidth:2048,maxHeight:1536" style="border: 1px solid rgb(204, 204, 204);width:400px;height:250px"></div>
+			</div>
+		</div></div>
+		
+		<style>
+		#bi_n + .slider {display:inline-block;margin-left:10px;margin-right:10px}
+		</style>
+		<div title="Two variable breakpoints" style="padding:10px"><div class='easyui-layout' data-options="fit:true">
+			<div data-options="region:'center'" style="padding:10px;" id="biv_table"></div>
+			<div data-options="region:'east',split:true,collapsible:true" style="width:500px;padding:10px">
+				<div id="biplot" class="easyui-resizable" data-options="maxWidth:2048,maxHeight:1536" style="border: 1px solid rgb(204, 204, 204);width:400px;height:250px"></div>
+				<div style="padding:2px;margin-bottom:30px;margin-top:20px">
+					<label for=bi_n>Number of points</label>
+					<input id="bi_n" type="slider" value="10" style="width:300px">
+				</div>
+				<label for=biv_flip>Flip axes</label><input type='checkbox' id='biv_flip'>
+			</div>
+		</div></div>
+		
+		<div title="Many-variable breakpoints"><div class='easyui-layout' data-options="fit:true">
+			<div data-options="region:'center'" style="padding:10px;" id="mult_table"></div>
+			<div data-options="region:'east',split:true,collapsible:true" style="width:500px;padding:10px">
+				<a href="#" class="easyui-linkbutton" onclick='mult.crossoverEquiconcern()'>Update many-variable breakpoints</a><br/>
+				<div id='mult_output'></div>
+			</div>
+		</div></div>
+	</div>
+	
+    <div id="win" class="easyui-window" title="Edit range" style="width:400px;height:200px"
+    data-options="iconCls:'icon-save',modal:true,closed:true">
+    </div>	
+	
+	<script type="text/javascript" src="model.js"></script>
+	<script type="text/javascript" src="view_datagrids.js"></script>
+	<script type="text/javascript" src="univariate.js"></script>
+	<script type="text/javascript" src="bivariate.js"></script>
+	<script type="text/javascript" src="multivariate.js"></script>
+	<script type="text/javascript" src="treemodel.js"></script>
+	<script type="text/javascript">
+	
+		var analysis = new Analysis();
+		var dgEquations = new DGEquations({ model: analysis, el: $("#dg-equations") });
+		var dgRanges = new DGRanges({ model: analysis, el: $("#dg-ranges") });
+		var npvText = new OutputStats({ model: analysis, el: $("#explain"), variable:'NPV' });
+
+		var singleOutputPlot = new SingleOutputPlot({model:analysis, el:$("#singleplot"),output:'NPV'});
+		
+		var univ = new UnivariateAnalysis({base:analysis,output:'NPV'});
+		var univTable = new UnivariateTable({model:univ,el:$("#univariate")});
+		
+		var biv=new BivariateAnalysis({base:analysis,output:'NPV'});
+		var bivOutputPlot = new BivOutputPlot({model:biv, el:$("#biplot")});
+		var biRadio = new BivRadioButtonTable({model:biv,el:$("#biv_table")});
+		$("#biv_flip").on('change',function(){biv.set("flip",$(this).is(':checked'))});
+		$("#bi_n").slider({from:0,to:400,scale:[0,'|',100,'|',200,'|',300,'|',400],limits:false,
+					callback:function(v){biv.set('n',parseInt(v))}
+					});
+					
+		var mult= new MultivarCrossover({base:analysis,output:'NPV'});
+		var multCheck = new MultivarCheckboxTable({model:mult,el:$("#mult_table"),template:$("#MultiVarRB_template")});
+		var multOut= new MultivarResultsTable({model:mult,univariate:univ,el:$("#mult_output"),template:$("#MultiVarResultsTable_template")});
+		
+		//ocpu.seturl("/breakdown/R")
+		ocpu.seturl("http://josephguillaume.ocpu.io/breakdown/R")
+		//ocpu.seturl("/breakdown/R")
+		ocpu.seturl("http://josephguillaume.ocpu.io/breakdown/R")
+    //ocpu.seturl("http://localhost:2775/ocpu/library/breakdown/R")
+		var treeView = new TreeView({
+							model: analysis,
+							el: $("#tt") 
+							});
+		var selectBase = new SelectScens({model:analysis,el:$('#select_base'),wscen:0});
+		var selectScen = new SelectScens({model:analysis,el:$('#select_scen'),wscen:1});
+		
+		tabs_handle_render = function(title,idx){
+			//console.log(title+' '+idx)
+			if(idx==4) singleOutputPlot.render();
+			if(idx==5) bivOutputPlot.render();
+		}
+		
+		//wrapper function to change variable for all the analyses
+		// in principle analyses could use different variables
+		setOutputVar = function(varname){
+			singleOutputPlot.output=varname;
+			singleOutputPlot.actual_render();
+			univ.set('output',varname);
+			biv.set('output',varname);
+			mult.set('output',varname);
+		}
+	</script>
+	
+	
+</body>
+</html>
