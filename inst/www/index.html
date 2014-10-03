@@ -135,6 +135,15 @@
 		</table>
 	</script>
 
+	<script type="text/template" id="EditBounds_template">
+		<ul>
+		<li>The best guess value for <%-variable%> is <span data-name='Best' class='xeditable' data-type='text' data-title='Enter best guess value'><%-Best%></span>.</li>
+		<li>The minimum value for which a crossover point could be of concern is <span data-name='Min' class=xeditable data-type='text' data-title='Enter minimum value of concern'><%-Min%></span>.</li>
+		<li>The maximum value for which a crossover point could be of concern is <span data-name='Max' class=xeditable data-type='text' data-title='Enter maximum value of concern'><%-Max%></span>.</li>
+		If a cross-over point is outside these bounds, it is not of concern.
+		</ul>
+	</script>
+	
 	<div data-options="region:'north'" style="height:70px;padding:5px">
 			<h1>Breakdown analysis</h1>
 	</div>
