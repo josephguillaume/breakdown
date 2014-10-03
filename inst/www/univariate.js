@@ -139,25 +139,24 @@ var UnivariateTable2 = Backbone.View.extend({
 						return value.toFixed(2)+"%";
 					}
 				},
-				{field:"PercToLimit",title:"Level of comfort",sortable:true,
-					formatter: function(value,row,index){
-						if(isNaN(value)) return ""
-						return (value*100).toFixed(2)+"%";
-					},
-					sorter:function(a,b){
-						if(isNaN(a) && isNaN(b)) return(1)
-						if(isNaN(a) && !isNaN(b)) return(-1)
-						if(!isNaN(a) && isNaN(b)) return(1)
-						return (a>b?1:-1);  
-					}
-				},
 				{field:"PercToLimit2",title:"Level of concern",sortable:true,
 					formatter: function(value,row,index){
 						if(isNaN(value)) return ""
 						return ((1-value)*100).toFixed(2)+"%";
 					},
 					sorter:function(a,b){ 
-						console.log(a)
+						if(isNaN(a) && isNaN(b)) return(1)
+						if(isNaN(a) && !isNaN(b)) return(1)
+						if(!isNaN(a) && isNaN(b)) return(-1)
+						return (a>b?1:-1);  
+					}
+				},
+				{field:"PercToLimit",title:"Level of comfort",sortable:true,
+					formatter: function(value,row,index){
+						if(isNaN(value)) return ""
+						return (value*100).toFixed(2)+"%";
+					},
+					sorter:function(a,b){
 						if(isNaN(a) && isNaN(b)) return(1)
 						if(isNaN(a) && !isNaN(b)) return(1)
 						if(!isNaN(a) && isNaN(b)) return(-1)
@@ -167,7 +166,7 @@ var UnivariateTable2 = Backbone.View.extend({
 			]],	
 			idField:'Variable',
 			sortName:"PercToLimit",
-			sortOrder:"desc",
+			sortOrder:"asc",
 			singleSelect:true,
 			//fit:true,
 			remoteSort:false,
