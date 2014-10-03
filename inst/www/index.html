@@ -254,12 +254,12 @@
 			<div data-options="region:'center'" style="padding:10px;">
 				<div>
 					<h2>How much does a single variable need to change to reach a crossover point?</h2>
-					For each variable separately, we aim to identify the value of that variable at which two alternatives have the same output, i.e. where a cross-over point occurs.
-					The cross-over points are ranked by their <span title="% distance from bound" class=definition>level of concern</span>/<span title="% distance from best guess" class=definition>level of comfort</span>. 
+					For each variable separately, we aim to identify the value of that variable at which two alternatives have the same output, i.e. where a <span class=definition title="A combination of values of variables where two alternatives have equal value. There is a cross-over at this point between which of the two alternatives has greater value than the other.">cross-over point</span> occurs.
+					The cross-over points are ranked and coloured by their <span title="% distance from maximum or minimum value" class=definition>level of concern</span>/<span title="% distance from best guess value" class=definition>level of comfort</span>. 
 					(<a href="#" onclick="$('#explain_loc').window('open');">Show more</a>)<br/>
 				</div>
 				<p><em>Levels of comfort and concern depend on the best guess, minimum and maximum values.
-				They are justified and can be edited in the pane on the right for the variable selected in the table.</em></p>
+				They are justified and can be edited in the pane on the right, for the variable selected in the table.</em></p>
 				<div id="univariate"></div>
 			</div>
 			<div data-options="region:'east',split:true,collapsible:true" style="width:500px;padding:10px">
@@ -320,11 +320,17 @@
     data-options="iconCls:'icon-save',modal:true,closed:true">
     </div>	
 
-    <div id="explain_loc" class="easyui-window" title="Level of concern" style="width:400px;height:200px" data-options="iconCls:'icon-info',modal:false,closed:true">
-		<ul id="">
+    <div id="explain_loc" class="easyui-window" title="Level of concern" style="width:400px;height:300px;padding:5px" data-options="iconCls:'icon-tip',modal:false,closed:true">
+		<ul>
 			<li>If a cross-over point is close to the best guess, it is of greater concern and lower comfort, because we may have a high risk of reaching that cross-over point. </li>
 			<li>If it is close to the specified maximum or minimum value, it is of lower concern and higher comfort because we have a high margin of safety.</li>
 			<li>If the level of comfort is less than 0% (or level of concern is greater than 100%), then the crossover point falls outside the specified bounds, meaning that it is not considered to be of concern.</li>
+		</ul>
+		Colours are used to highlight levels of concern:
+		<ul>
+		<li>Red: Level of concern is greater than 75%</li>
+		<li>Orange: Level of concern is between 25% and 75%</li>
+		<li>Green: Level of concern is less than 25%</li>
 		</ul>
 	</div>	
 	
