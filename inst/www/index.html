@@ -320,13 +320,13 @@
 		var dgRanges = new DGRanges({ model: analysis, el: $("#dg-ranges") });
 		var npvText = new OutputStats({ model: analysis, el: $("#explain"), variable:'NPV' });
 
-		var singleOutputPlot = new SingleOutputPlot({model:analysis, el:$("#singleplot"),output:'NPV'});
+		var singleOutputPlot = new SingleOutputPlot({model:analysis, el:$("#singleplot")});
 		
-		var univ = new UnivariateAnalysis({base:analysis,output:'NPV'});
+		var univ = new UnivariateAnalysis({base:analysis});
 		var univTable = new UnivariateTable2({model:univ,el:$("#univariate")});
 		var editbound1 = new EditBounds({model:analysis,el:$("#editbound1")})
 		
-		var biv=new BivariateAnalysis({base:analysis,output:'NPV'});
+		var biv=new BivariateAnalysis({base:analysis});
 		var bivOutputPlot = new BivOutputPlot({model:biv, el:$("#biplot")});
 		var biRadio = new BivRadioButtonTable({model:biv,el:$("#biv_table")});
 		$("#biv_flip").on('change',function(){biv.set("flip",$(this).is(':checked'))});
@@ -334,7 +334,7 @@
 					callback:function(v){biv.set('n',parseInt(v))}
 					});
 					
-		var mult= new MultivarCrossover({base:analysis,output:'NPV'});
+		var mult= new MultivarCrossover({base:analysis});
 		var multCheck = new MultivarCheckboxTable({model:mult,el:$("#mult_table"),template:$("#MultiVarRB_template")});
 		ocpu.seturl("/breakdown/R")
 		//ocpu.seturl("http://josephguillaume.ocpu.io/breakdown/R")
@@ -355,14 +355,6 @@
 			if(idx==5) bivOutputPlot.render();
 		}
 		
-		//wrapper function to change variable for all the analyses
-		// in principle analyses could use different variables
-		setOutputVar = function(varname){
-			singleOutputPlot.output=varname;
-			singleOutputPlot.actual_render();
-			univ.set('output',varname);
-			biv.set('output',varname);
-			mult.set('output',varname);
 		}
 	</script>
 	

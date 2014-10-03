@@ -6,6 +6,8 @@ var UnivariateAnalysis = Backbone.Model.extend({
 		univariate_crossover:[]
 	},
 	initialize:function(){
+		if(!this.get('output')) this.listenTo(this.get("base"),'change:output_var', 
+			function(){this.set('output',this.get("base").get('output_var'))}, this);
 		//univariateCrossover is called if any of the attributes change
 		this.on('change:output',this.univariateCrossover,this);
 		this.listenTo(this.get("base"),'change:ranges', this.univariateCrossover, this);

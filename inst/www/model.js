@@ -45,6 +45,7 @@ var Analysis = Backbone.Model.extend({
 		ranges:[],
 		scens:[1,2],
 		selected_var1: null,
+		output_var:null,
 		ranges_cols:["Variable","Lower","Min","Best","Max","Upper"],
 		showEquation:false
 	},
@@ -69,6 +70,9 @@ var Analysis = Backbone.Model.extend({
 		});
 		equations.splice(0,1); //remove header
 		this.set('equations',equations);
+		//Default output variable is NPV
+		var idx=this.get('equations').map(function(x){return x[0]}).indexOf('NPV');
+		if(idx>1) this.set('output_var','NPV');
 		//Ranges
 		var ranges=csv.map(function(x){
 			return x.slice(0,6);
@@ -206,6 +210,7 @@ var SingleOutputPlot = Backbone.View.extend({
 	initialize: function(args){
 		this.dirty = true;
 		this.output=args.output;
+		if(!args.output) this.model.on('change:output_var', this.refresh_output, this);
 		this.model.on('change:ranges', this.actual_render, this);
 		this.model.on('change:equations', this.actual_render, this);
 		this.model.on('change:selected_var1',this.actual_render,this);
@@ -213,7 +218,12 @@ var SingleOutputPlot = Backbone.View.extend({
 		var obj=this;
 		this.$el.resizable({onStopResize:function(){obj.actual_render()}});
 	},
+	refresh_output:function(){
+		this.output=this.model.get('output_var');
+		this.actual_render();
+	},
 	render:function(){
+		if(!this.output) return this;
 		if(!this.$el.is(":visible")) return this;
 		if(!this.dirty) return this; //don't rerun unless plot actually needs to change
 		console.log("render SingleOutputPlot");

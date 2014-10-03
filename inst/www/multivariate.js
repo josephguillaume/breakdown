@@ -5,6 +5,10 @@ var MultivarCrossover = Backbone.Model.extend({
 		multivar_result:null,
 		base:null
 	},
+	initialize:function(){
+		if(!this.get('output')) this.listenTo(this.get("base"),'change:output_var', 
+			function(){this.set('output',this.get("base").get('output_var'))}, this);
+	},
 	crossoverEquiconcern: function(){
 		//analysis is to be run on request
 		if(!this.get("output")) return this;
