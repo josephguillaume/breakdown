@@ -473,7 +473,10 @@ var EditableNote = Backbone.View.extend({
 		} else {
 			this.$el.editable('enable');
 		}
-		this.$el.editable('setValue',this.model.get('notes').get(this.model.get('selected_var1')).get(this.field));
+		var note=this.model.get('notes').get(this.model.get('selected_var1'));
+		//console.log(note);
+		if (note==null) note = this.model.get('notes').add({id:this.model.get('selected_var1')});
+		this.$el.editable('setValue',note.get(this.field));
 		return this;
 	}
 });
