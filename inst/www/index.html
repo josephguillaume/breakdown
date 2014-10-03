@@ -172,7 +172,7 @@
 			Investigation of effect of assumptions on comparison of alternatives, e.g. within cost-benefit analysis
 	</div>
 		
-	<div id="tabs" data-options="region:'center',plain:true,tabPosition:'left',headerWidth:170,onSelect:tabs_handle_render" class="easyui-tabs">	
+	<div id="tabs" data-options="region:'center',plain:true,tabPosition:'left',headerWidth:180,onSelect:tabs_handle_render" class="easyui-tabs">	
 		<style>
 			.l-btn{
 				vertical-align:middle;
@@ -186,50 +186,61 @@
 				vertical-align:middle;
 			}
 		</style>
-		<div title="Load" style="padding:20px">
+		<div title="Start" style="padding:20px">
+			<h2>Quickstart</h2>
+			<a href="#" class="easyui-linkbutton" onclick='loadDemo(analysis)'>Load demo</a> and explore the effect of changes in assumptions on the financial value of managed aquifer recharge ('basin' and 'injection' scenarios) compared to storage of water in dams ('base').
+			<h2>Introduction</h2>
+			<p>
+			Some analyses, e.g. cost-benefit analysis, involve comparing the value of two or more alternatives. 
+			The results depend on estimates of many variables, which are often uncertain.
+			It can be useful to check how the conclusion might change with different assumptions about the estimates of these variables: 
+			<em>is it possible that a <span class=definition title="A combination of values of variables where two alternatives have equal value. There is a cross-over at this point between which of the two alternatives has greater value than the other.">'cross-over point'</span> 
+			will occur</em>, such that the alternative that has the greater value will change depending on the assumptions we make?
+			</p>
+			<p>
+			This tool steps through this analysis, allowing you to change assumptions used along the way.<br/>
+			<ol>
+			<p>Initial analysis:</p>
+				<li>Define the equations used to calculate the value of each alternative</li>
+				<li>Define the minimum and maximum values of variables that we want to explore</li>
+			<p>Breakdown analysis:</p>
+				<li>Break-down the initial result obtained for each alternative, showing where it comes from</li>
+			<p>Cross-over point analysis:</p>
+				<li>Identify cross-over points where values of single variables are changed</li>
+				<li>Identify cross-over points where values of pairs of variables are changed</li>
+				<li>Identify cross-over points where values of many variables are changed</li>
+			</ol>
+			</p>
 			
-			<div class="easyui-panel" style="padding:5px;">
-				<a href="#" class="easyui-linkbutton" onclick='loadDemo(analysis)' data-options='plain:true,iconCls:"icon-tip"'>Load demo</a>
-				<span class="button-sep"></span>
-				<a href="#" class="easyui-linkbutton" onclick='$("#csvAllInput").click()' data-options='plain:true,iconCls:"icon-add"'>Load combined CSV</a>
+			<h2>Initial analysis</h2>
+			Several options are available:
+			<ul>
+			<li><a href="#" class="easyui-linkbutton" onclick='loadDemo(analysis)'>Load demo</a>
+			Financial comparison of value of storing water in dams ('base' scenario) vs. underground via infiltration basins ('basin' scenario) or via injection in a well ('injection' scenario)</li>
+			<li><a href="#" class="easyui-linkbutton" onclick='$("#csvAllInput").click()'>Load combined CSV</a>
 				<input type="file" id="csvAllInput" onchange="readCsv(this.files,function(x){analysis.AllFromCSV(x)},';')" accept=".csv" style="display:none">
-				<span class="button-sep"></span>
-				<a href="#" class="easyui-linkbutton" onclick='$("#csvEquationsInput").click()' data-options='plain:true,iconCls:"icon-add"'>Load equations CSV</a>
+				If you have a CSV file that contains equations, notes and ranges in the format used by this tool.</li>
+			<li><a href="#" class="easyui-linkbutton" onclick='$("#csvEquationsInput").click()'>Load equations CSV</a>
 				<input type="file" id="csvEquationsInput" onchange="readCsv(this.files,function(x){analysis.EquationsfromCSV(x)})" accept=".csv" style="display:none">
-				<span class="button-sep"></span>
-				<a href="#" class="easyui-linkbutton" onclick='setDefault(analysis)' data-options='plain:true,iconCls:"icon-sum"'>Set default ranges</a>
-				<span class="button-sep"></span>
-				<a id="dl_csv" class="easyui-linkbutton" download='breakdown.csv' onclick='downloadCSV(analysis)' data-options='plain:true,iconCls:"icon-save"'>Download combined CSV</a>
-				<span class="button-sep"></span>
-			</div>
-			<h2>Load equations and ranges</h2>
-			<li>'Load equations CSV' expects a CSV with first column the name of each variable, and other columns the equation to calculate each variable</li>
-			<li>'Set default ranges' calculates default analysis bounds as 1% and 1000% of the modeled numeric values defined in the equations</li>
-			<h2>Save equations and ranges</h2>
-			<li>'Download combined csv' exports a csv that includes ranges, notes and equations for all variables</li>
-			<h2>Define settings</h2>
-			<style>
-			.unknown-scen{color:red}
-			</style>
-			<label for='select_base'>Baseline: </label><input id="select_base" name="select_base" value="">			
-			<label for='select_scen'>Scenario: </label><input id="select_scen" name="select_scen" value="">
-			<a class="easyui-linkbutton" onclick='addScens(analysis,[$("#select_base").combobox("getText"),$("#select_scen").combobox("getText")])'>Add new scenarios</a>
+				If you have a CSV file that only contains equations. The CSV file should have the first column as the name of each variable, and in other columns the equation to calculate each variable. The header should provide the name for each alternative scenario.</li>
+			<li><a href="#" class="easyui-linkbutton" onclick='$("#win_equations").window("open")'>Equations spreadsheet</a>
+			Spreadsheet entry of equations if you want to enter them manually. The spreadsheet can also be used to modify an existing analysis.</li>
+			<li><a href="#" class="easyui-linkbutton" onclick='setDefault(analysis)'>Set default ranges</a>
+			If you already have equations defined and would like the tool to set default ranges which you can then modify. 
+			Minimum and maximum values for each variable are respectively set to 1% and 1000% of the values given in the equations.</li>
+			<li><a href="#" class="easyui-linkbutton" onclick='$("#win_ranges").window("open")'>Ranges spreadsheet</a>
+			Spreadsheet entry of minimum and maximum values, if you want to enter them manually. The spreadsheet can also be used to modify an existing analysis.</li>
+			</ul>
+			
+			The analysis can also be saved and wiped clean:
+			<ul>
+			<li><a id="dl_csv" class="easyui-linkbutton" download='breakdown.csv' onclick='downloadCSV(analysis)'>Download combined CSV</a>
+			Exports a csv that includes ranges, notes and equations for all variables and can be reloaded later.</li>
+			<li><a href="#" class="easyui-linkbutton" onclick='location.reload();'>Reset to blank analysis</a> Page is reloaded and all changes are discarded.
+			</ul>
+			
 		</div>
 	
-		<div title="Equations" data-options="fit:true"><div class="easyui-layout" data-options="fit:true">
-			
-			<div data-options="region:'center'">
-				<div id="eq_tb">
-					<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick='addrow($("#dg-equations"))'>Add</a>
-					<a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick='deleterow($("#dg-equations"),analysis,"equations")'>Delete</a>
-				</div>
-				<table id="dg-equations" toolbar="#eq_tb"></table>		
-			</div>
-			
-			<div id="explain" style="padding:10px;width:200px;" data-options="region:'east',split:true,collapsible:true"></div>
-
-		</div></div>	
-		
 		<div title="Equation Breakdown"><div class="easyui-layout" data-options="fit:true">
 			<div data-options="region:'north'" style="height:35px;padding:5px;border:false;collapsible:false">
 				<a href="#" class="easyui-linkbutton" onclick='analysis.set("showEquation",!analysis.get("showEquation"))'>Toggle equations</a>
@@ -238,14 +249,6 @@
 				<table id="tt"></table>
 			</div>
 		</div></div>	
-		
-		<div title="Variable Ranges">
-			<div id="ra_tb">
-				<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick='addrow($("#dg-ranges"))'>Add</a>
-				<a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick='deleterow($("#dg-ranges"),analysis,"ranges")'>Delete</a>
-			</div>
-			<table id="dg-ranges" toolbar="#ra_tb"></table>
-		</div>
 
 		<div title="Single variable breakpoints" id="tab_univ"><div class="easyui-layout" data-options="fit:true">		
 			<div data-options="region:'center'" style="padding:10px;">
@@ -387,8 +390,8 @@
 		
 		tabs_handle_render = function(title,idx){
 			//console.log(title+' '+idx)
-			if(idx==4) singleOutputPlot.render();
-			if(idx==5) bivOutputPlot.render();
+			if(idx==2) singleOutputPlot.render();
+			if(idx==3) bivOutputPlot.render();
 		}
 		
 		addVar=function(model,name){
