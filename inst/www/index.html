@@ -151,8 +151,25 @@
 		</ul>
 	</script>
 	
-	<div data-options="region:'north'" style="height:70px;padding:5px">
-			<h1>Breakdown analysis</h1>
+	<div data-options="region:'north'" style="height:90px;padding:5px">
+		<div style="float:right">
+			<style>
+			.unknown-scen{color:red}
+			</style>
+			<label for='select_base'>Baseline: </label><input id="select_base" name="select_base" value="">			
+			<label for='select_scen'>Scenario: </label><input id="select_scen" name="select_scen" value="">
+			<a class="easyui-linkbutton" onclick='addScens(analysis,[$("#select_base").combobox("getText"),$("#select_scen").combobox("getText")])'>Add new scenarios</a>
+			<br/>
+			<label for='select_output' title="Name of variable used to compare alternatives" class=definition>Output variable: </label><input id="select_output" name="select_output" value="">
+			<a class="easyui-linkbutton" onclick='addVar(analysis,$("#select_output").combobox("getText"))'>Add new variable</a>
+			<br/>
+			Spreadsheets: 
+			<a href="#" class="easyui-linkbutton" onclick='$("#win_equations").window("open")'>Equations</a>
+			<a href="#" class="easyui-linkbutton" onclick='$("#win_ranges").window("open")'>Ranges</a>
+			<br/>
+		</div>	
+			<h1>Breakdown and crossover analysis</h1>
+			Investigation of effect of assumptions on comparison of alternatives, e.g. within cost-benefit analysis
 	</div>
 		
 	<div id="tabs" data-options="region:'center',plain:true,tabPosition:'left',headerWidth:170,onSelect:tabs_handle_render" class="easyui-tabs">	
@@ -308,6 +325,23 @@
 		</ul>
 	</div>	
 	
+	<div id="win_ranges" title="Variable Ranges" class="easyui-window" data-options="iconCls:'icon-tip',modal:false,closed:true" style="width:800px;height:400px" >
+		<div id="ra_tb">
+			<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick='addrow($("#dg-ranges"))'>Add</a>
+			<a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick='deleterow($("#dg-ranges"),analysis,"ranges")'>Delete</a>
+		</div>
+		<table id="dg-ranges" toolbar="#ra_tb"></table>
+	</div>
+
+	<div id="win_equations" title="Equations" class="easyui-window" data-options="iconCls:'icon-tip',modal:false,closed:true" style="width:800px;height:400px">
+		<div id="eq_tb">
+			<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick='addrow($("#dg-equations"))'>Add</a>
+			<a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick='deleterow($("#dg-equations"),analysis,"equations")'>Delete</a>
+		</div>
+		<table id="dg-equations" toolbar="#eq_tb"></table>		
+	</div>
+			
+	
 	<script type="text/javascript" src="model.js"></script>
 	<script type="text/javascript" src="view_datagrids.js"></script>
 	<script type="text/javascript" src="univariate.js"></script>
@@ -347,6 +381,8 @@
 		var selectBase = new SelectScens({model:analysis,el:$('#select_base'),wscen:0});
 		var selectScen = new SelectScens({model:analysis,el:$('#select_scen'),wscen:1});
 		
+		var selectOut = new SelectOutput({model:analysis,el:$('#select_output')});
+		
 		var notes1=_.map(["bestguess","bounds","direction","is_problem"],function(n){ return new EditableNote({model:analysis,el:$("#notes_"+n+"1"),field:n})});
 		
 		tabs_handle_render = function(title,idx){
@@ -355,6 +391,18 @@
 			if(idx==5) bivOutputPlot.render();
 		}
 		
+		addVar=function(model,name){
+			var data=model.get('equations').map(function(arr){return arr.slice();});
+			var index=data.length;
+			data[index]=[];
+			for(i=0;i<model.get("header").length;i++){
+				if(!data[index][i]) data[index][i]="";
+			}
+			data[index][0]=name;
+			model.set('equations',data);
+			model.set('selected_var1',name);
+			model.set('output_var',name);
+			$("#win_equations").window("open");
 		}
 	</script>
 	
