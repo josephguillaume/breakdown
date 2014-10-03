@@ -445,7 +445,6 @@ loadDemo=function(model,url){
 	})
 }
 
-
 var EditableNote = Backbone.View.extend({
 	//model is an Analysis
 	initialize: function(args){
@@ -475,6 +474,39 @@ var EditableNote = Backbone.View.extend({
 			this.$el.editable('enable');
 		}
 		this.$el.editable('setValue',this.model.get('notes').get(this.model.get('selected_var1')).get(this.field));
+		return this;
+	}
+});
+
+var EditBounds = Backbone.View.extend({
+	//model is an Analysis
+	initialize: function(){
+		this.listenTo(this.model,'change:selected_var1', this.render, this);
+		this.listenTo(this.model,'change:ranges', this.render, this);
+	},
+	render: function(){
+		if(this.model.get('selected_var1')==null) return this;
+		var ranges=this.model.getRanges(this.model.get('selected_var1'),false);
+		this.$el.find(".xeditable").editable('destroy')
+		this.$el.html(_.template($("#EditBounds_template").html(),{
+			variable:ranges.Variable[0],
+			Best:ranges.Best[0],
+			Min:ranges.Min[0],
+			Max:ranges.Max[0]
+			}));
+		var model=this.model;
+		this.$el.find(".xeditable").editable({
+			mode:'inline',
+			unsavedclass:null, //TODO: persistent storage of notes other than by export to csv
+		    success: function(response, newValue) {
+				//console.log('EditBounds for '+view.model.get('selected_var1'));
+				var data=model.get('ranges').map(function(arr){return arr.slice();});
+				//TODO: should be data-pk instead?
+				var row=data.map(function(x){return x[0]}).indexOf(model.get('selected_var1'));
+				var col=({Best:3,Min:2,Max:4})[$(this).data('name')];
+				data[row][col]=newValue;
+				model.set('ranges',data);
+			}})
 		return this;
 	}
 });
