@@ -15,6 +15,8 @@
 	<script type="text/javascript" src="js/jquery.csv-0.71.min.js"></script>
 	<script type="text/javascript" src="js/opencpu-0.5.js"></script>
 	
+	<link href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/jquery-editable/css/jquery-editable.css" rel="stylesheet"/>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/jquery-editable/js/jquery-editable-poshytip.min.js"></script>
 	<style>
 	.highconcern {color:red}
 	.midconcern {color:orange}
@@ -26,6 +28,11 @@
 		text-align:right;
 	}
 	.jslider{display:inline-block;width:150px;margin-bottom:20px;margin-top:15px;margin-left:7px;margin-right:7px}
+
+	.definition {
+		border-bottom: 1px dotted #000;
+		text-decoration: none;
+	}
 	</style>
 
 </head>
@@ -224,9 +231,44 @@
 		</div>
 
 		<div title="Single variable breakpoints" id="tab_univ"><div class="easyui-layout" data-options="fit:true">		
-			<div data-options="region:'center'" style="padding:10px;" id="univariate"></div>
+			<div data-options="region:'center'" style="padding:10px;">
+				<div>
+					<h2>How much does a single variable need to change to reach a crossover point?</h2>
+					For each variable separately, we aim to identify the value of that variable at which two alternatives have the same output, i.e. where a cross-over point occurs.
+					The cross-over points are ranked by their <span title="% distance from bound" class=definition>level of concern</span>/<span title="% distance from best guess" class=definition>level of comfort</span>. 
+					(<a href="#" onclick="$('#explain_loc').window('open');">Show more</a>)<br/>
+				</div>
+				<p><em>Levels of comfort and concern depend on the best guess, minimum and maximum values.
+				They are justified and can be edited in the pane on the right for the variable selected in the table.</em></p>
+				<div id="univariate"></div>
+			</div>
 			<div data-options="region:'east',split:true,collapsible:true" style="width:500px;padding:10px">
 				<div id="singleplot" class="easyui-resizable" data-options="maxWidth:2048,maxHeight:1536" style="border: 1px solid rgb(204, 204, 204);width:400px;height:250px"></div>
+				<!--
+				<p><em>Levels of comfort and concern depend on the best guess, minimum and maximum values. 
+					They are justified here and can be edited for the variable selected in the table on the left.</em></p>
+				<br/>-->
+				<br/>
+				<div id="editbound1"></div>
+				<br/>
+				<b>Why is the best guess value selected:</b>
+				<br/>
+				<p id="notes_bestguess1" style="width:100%"></p>
+				  <br>
+                  <b>What influences the bounds:</b>
+                  <br/>
+                  <li>Is this crossover point of concern? Why/why not?</li>
+                  <li>What should the bounds be?</li>
+                  <li>If there is no crossover point, is this expected? why?</li>
+				  <p id="notes_bounds1" style="width:100%"></p>
+                  <br/>
+                  <b>What direction of change is expected? Does it match the model results?</b>
+				  <p id="notes_direction1" style="width:100%"></p>
+                  <br/>
+                  <b>Given this crossover point exists, can we conclude that any of the options should be ruled out? Why?</b>
+                  <li>What further analysis might show the crossover point is not of concern?</li>
+                  <li>What can we do to avoid this crossover point?</li>
+                  <p id="notes_is_problem1" style="width:100%"></p>
 			</div>
 		</div></div>
 		
@@ -257,6 +299,14 @@
     <div id="win" class="easyui-window" title="Edit range" style="width:400px;height:200px"
     data-options="iconCls:'icon-save',modal:true,closed:true">
     </div>	
+
+    <div id="explain_loc" class="easyui-window" title="Level of concern" style="width:400px;height:200px" data-options="iconCls:'icon-info',modal:false,closed:true">
+		<ul id="">
+			<li>If a cross-over point is close to the best guess, it is of greater concern and lower comfort, because we may have a high risk of reaching that cross-over point. </li>
+			<li>If it is close to the specified maximum or minimum value, it is of lower concern and higher comfort because we have a high margin of safety.</li>
+			<li>If the level of comfort is less than 0% (or level of concern is greater than 100%), then the crossover point falls outside the specified bounds, meaning that it is not considered to be of concern.</li>
+		</ul>
+	</div>	
 	
 	<script type="text/javascript" src="model.js"></script>
 	<script type="text/javascript" src="view_datagrids.js"></script>
@@ -273,7 +323,8 @@
 		var singleOutputPlot = new SingleOutputPlot({model:analysis, el:$("#singleplot"),output:'NPV'});
 		
 		var univ = new UnivariateAnalysis({base:analysis,output:'NPV'});
-		var univTable = new UnivariateTable({model:univ,el:$("#univariate")});
+		var univTable = new UnivariateTable2({model:univ,el:$("#univariate")});
+		var editbound1 = new EditBounds({model:analysis,el:$("#editbound1")})
 		
 		var biv=new BivariateAnalysis({base:analysis,output:'NPV'});
 		var bivOutputPlot = new BivOutputPlot({model:biv, el:$("#biplot")});
@@ -296,10 +347,11 @@
 		var selectBase = new SelectScens({model:analysis,el:$('#select_base'),wscen:0});
 		var selectScen = new SelectScens({model:analysis,el:$('#select_scen'),wscen:1});
 		
+		var notes1=_.map(["bestguess","bounds","direction","is_problem"],function(n){ return new EditableNote({model:analysis,el:$("#notes_"+n+"1"),field:n})});
+		
 		tabs_handle_render = function(title,idx){
 			//console.log(title+' '+idx)
 			if(idx==4) singleOutputPlot.render();
-			
 			if(idx==5) bivOutputPlot.render();
 		}
 		
