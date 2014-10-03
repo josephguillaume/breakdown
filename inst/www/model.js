@@ -164,12 +164,12 @@ var Analysis = Backbone.Model.extend({
 	normalise:function(x,variable){
 		val=parseFloat(x);
 		ranges=_.object(this.get("ranges_cols"),this.getRanges(variable)[0]);
-		if(!ranges.Best) return(NaN)
-		if(!ranges.Min) return(NaN)
-		if(!ranges.Max) return(NaN)
+		if(!$.isNumeric(ranges.Best)) return(NaN)
+		if(!$.isNumeric(ranges.Min)) return(NaN)
+		if(!$.isNumeric(ranges.Max)) return(NaN)
 		if(Math.abs(x-ranges.Best) < 1e-5){return(0)}
 		if(x>ranges.Best){return (x-ranges.Best)/(ranges.Max-ranges.Best)}
-		if(x>ranges.Best){return (ranges.Best-x)/(ranges.Best-ranges.Min)}
+		if(x<ranges.Best){return (ranges.Best-x)/(ranges.Best-ranges.Min)}
 	},
 	evaluate:function(column,variable){
 		if(this.get('equations').length==0) return(this)
