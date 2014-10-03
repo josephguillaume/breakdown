@@ -94,13 +94,13 @@ var UnivariateTable = Backbone.View.extend({
 
 var UnivariateTable2 = Backbone.View.extend({
     initialize: function(){
-		this.listenTo(this.model.get("base"),'change:selected_var1',this.setselected,this);
+		this.listenTo(this.model.get("base"),'change:selected_var1',this.setSelected,this);
 		this.listenTo(this.model.get("base"),'change:ranges', this.render, this);
 		this.listenTo(this.model,'change:univariate_crossover', this.render, this);
 		this.render();
 	},
 	setSelected:function(){
-		var selected=this.model.get('selected_var1');
+		var selected=this.model.get("base").get('selected_var1');
 		//console.log("setSelected on equations "+selected);
 		if(selected) this.$el.datagrid('selectRecord',selected);
 	},
