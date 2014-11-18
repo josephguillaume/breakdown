@@ -25,10 +25,10 @@ readCsv = function(files,handler,separator){
 var Note = Backbone.Model.extend({
 	defaults:{
 		id:null,
-		bestguess:null,
-		bounds:null,
-		direction:null,
-		is_problem:null
+		bestguess:"",
+		bounds:"",
+		direction:"",
+		is_problem:""
 	}
 });
 
@@ -110,10 +110,17 @@ var Analysis = Backbone.Model.extend({
 			["bestguess","bounds","direction","is.problem"],
 			head_eqns
 		)];
+		var notes=this.get('notes');
 		$.each(vars_eqns,function(i,v){
 			var row_eqns=eqns[i].slice();
 			var var_name=row_eqns.splice(0,1);
-			var row_notes=["","","",""];
+			var note=notes.get(v);
+			var row_notes=[
+				note.get("bestguess"),
+				note.get("bounds"),
+				note.get("direction"),
+				note.get("is_problem")
+			];
 			var row_ranges=["","","","",""];
 			var idx_ranges=vars_ranges.indexOf(v);
 			if(idx_ranges > -1){
