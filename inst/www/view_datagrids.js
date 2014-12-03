@@ -139,6 +139,9 @@ var DGRanges = Backbone.View.extend({
 		var data=model.get("ranges");
 		//TODO: show calculated modeled value as default Best
 		data=data.map(function(x){return({Variable:x[0],Lower:x[1],Min:x[2],Best:x[3],Max:x[4],Upper:x[5]});});
+		
+		var noEnterHandler= $.extend({},$.fn.combobox.defaults.keyHandler,{enter:function(q){return true;}});
+		
 		this.$el.datagrid({
 			data: data,
 			idField:'Variable',
@@ -151,7 +154,8 @@ var DGRanges = Backbone.View.extend({
 						valueField:'value',
 						textField:'value',
 						//TODO: only allow the variable if it has the same value in each column?
-						data:model.get("equations").map(function(x){return({value:x[0]})})
+						data:model.get("equations").map(function(x){return({value:x[0]})}),
+						keyHandler:noEnterHandler
 					}
 				}
 			},
@@ -176,7 +180,7 @@ var DGRanges = Backbone.View.extend({
 					$(ed.target).next().children("input").focus();
 					$(document).on('keydown',function(e){
 						if(e.keyCode==13){dg.datagrid('endEdit', index);$(document).off('keydown');return false;}
-					}).on('keydown',function(e){
+						if(e.keyCode==9){dg.datagrid('endEdit', index);$(document).off('keydown');return false;}
 						if(e.keyCode==27){dg.datagrid('cancelEdit', index);$(document).off('keydown');return false;}
 					});
 				} else {
@@ -186,7 +190,7 @@ var DGRanges = Backbone.View.extend({
 						dg.datagrid('endEdit', index);
 					}).on('keydown',function(e){
 						if(e.keyCode==13){dg.datagrid('endEdit', index);return false;}
-					}).on('keydown',function(e){
+						if(e.keyCode==9){dg.datagrid('endEdit', index);$(document).off('keydown');return false;}
 						if(e.keyCode==27){dg.datagrid('cancelEdit', index);return false;}
 					});
 				}
