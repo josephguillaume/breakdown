@@ -25,12 +25,21 @@ promptEquation = function(model,row,field){
 	var index=names.indexOf(row.name);
 	var scens=model.get("scens");
 	var col=parseInt(field.replace("scen",""))-1
+	if(index==-1){
+		//add a new variable
+		index=data.push([row.name])-1; 
+		//all scenarios need to be present
+		// for ocpu to send a matrix not a list
+		for(i=0;i<model.get("header").length;i++){
+			if(!data[index][i]) data[index][i]="";
+		}
+	}
 	var equation=data[index][scens[col]]
 	var header=model.get("header");
 	var newequation=prompt("Equation/value for '"+row.name+"' ("+header[scens[col]]+")",equation);
     if(newequation) {
 		data[index][scens[col]]=newequation;
-		console.log(data);
+		//console.log(data);
 		model.set('equations',data);
 	}
 }
