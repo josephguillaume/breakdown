@@ -8,9 +8,13 @@ readCsv = function(files,handler,separator){
 		reader.readAsText(files[0]);
 		reader.onload = function(event){
 			//http://code.google.com/p/jquery-csv/downloads/list
-			var result = $.csv.toArrays(event.target.result,{separator:separator});
-			//console.log(result);
-			handler(result);
+			try{
+				var result = $.csv.toArrays(event.target.result,{separator:separator});
+				//console.log(result);
+				handler(result);
+			} catch(err){
+				alert(err.message)
+			}
 		};
 		reader.onerror = function(event){
 		    if(evt.target.error.name == "NotReadableError") {
