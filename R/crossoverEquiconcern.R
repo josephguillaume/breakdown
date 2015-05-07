@@ -18,7 +18,7 @@ crossoverEquiconcern=function(equations.scen, equations.baseline, var, ranges,bo
   if(identical(bounds,"combn")) bounds<-do.call(expand.grid,lapply(apply(ranges[,c("Min","Max")],1,as.list),unlist))
   if(identical(bounds,"opt_max")) {
     dirs=guessDirectionMax(f.scen=f.scen,f.baseline=f.baseline,ranges=ranges)
-    bounds=matrix(ifelse(dirs=="closer",ranges$Max,ifelse(cc=="further",ranges$Min,ranges$Best)),nrow=1)
+    bounds=matrix(ifelse(dirs=="closer",ranges$Max,ifelse(dirs=="further",ranges$Min,ranges$Best)),nrow=1)
   }
   if(identical(bounds,"opt_cor")) {
     cc=cor_kendall(f.scen=f.scen,f.baseline=f.baseline,ranges=ranges)
