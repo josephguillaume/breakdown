@@ -17,8 +17,8 @@ var MultivarCrossover = Backbone.Model.extend({
 		var model=this;
 		var ranges=base.getRanges(this.get("vars"),false);
 		var req=ocpu.rpc("crossoverEquiconcern",{
-				'equations.scen':base.selectEqns([base.get('scens')[0]]),
-				'equations.baseline':base.selectEqns([base.get('scens')[1]]),
+				'equations.scen':base.selectEqns([base.get('scens')[1]]),
+				'equations.baseline':base.selectEqns([base.get('scens')[0]]),
 				'var':this.get("output"),
 				ranges:ranges
 		},function(result){

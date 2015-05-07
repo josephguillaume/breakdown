@@ -26,8 +26,8 @@ var UnivariateAnalysis = Backbone.Model.extend({
 		
 		console.log("univariateCrossover");
 		var req=ocpu.rpc("univariateCrossover",{
-				'equations.scen':base.selectEqns([base.get('scens')[0]]),
-				'equations.baseline':base.selectEqns([base.get('scens')[1]]),
+				'equations.scen':base.selectEqns([base.get('scens')[1]]),
+				'equations.baseline':base.selectEqns([base.get('scens')[0]]),
 				'var':model.get('output'),
 				ranges:ranges
 			},function(data){

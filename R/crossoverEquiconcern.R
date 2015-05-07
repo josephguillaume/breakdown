@@ -23,7 +23,9 @@ crossoverEquiconcern=function(equations.scen, equations.baseline, var, ranges,bo
   if(identical(bounds,"opt_cor")) {
     cc=cor_kendall(f.scen=f.scen,f.baseline=f.baseline,ranges=ranges)
     if(any(cc!=1 & cc!=-1 & cc!=0)) stop("cor_kendall says function is not monotonic in all variables")
-    bounds=matrix(ifelse(cc==1,ranges$Max,ifelse(cc==-1,ranges$Min,ranges$Best)),nrow=1)    
+    # if current difference is positive, need to reduce difference; if negative, increase difference
+    if(netdiff()<0){ bounds=matrix(ifelse(cc==1,ranges$Max,ifelse(cc==-1,ranges$Min,ranges$Best)),nrow=1)
+    } else {bounds=matrix(ifelse(cc==1,ranges$Min,ifelse(cc==-1,ranges$Max,ranges$Best)),nrow=1)}
   }
   ## Identify crossover point along each line of equal concern
   locs=apply(bounds,1,function(bound){

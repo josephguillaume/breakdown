@@ -26,8 +26,8 @@ var BivariateAnalysis = Backbone.Model.extend({
 		var biv=this;
 		var ranges=base.getRanges(this.get("vars"),false);
 		var req=ocpu.call("bivariateCrossover",{
-				'equations.scen':base.selectEqns([base.get('scens')[0]]),
-				'equations.baseline':base.selectEqns([base.get('scens')[1]]),
+				'equations.scen':base.selectEqns([base.get('scens')[1]]),
+				'equations.baseline':base.selectEqns([base.get('scens')[0]]),
 				'var':this.get("output"),
 				ranges:ranges,
 				n:this.get("n")
