@@ -9,9 +9,9 @@ guessDirectionMax=function(equations.scen,equations.baseline,var,ranges,eps=1e-8
     origx=ranges$Best[ranges$Variable==v]
     maxx=ranges$Upper[ranges$Variable==v]
     stopifnot(maxx>origx)
-    maxy=list(x)
+    x=list(maxx)
     names(x)=v
-    do.call(f.diff,x)
+    maxy = do.call(f.diff,x)
     if(abs(maxy - origy)<eps) { return("no effect")
     } else if (abs(maxy) >= abs(origy)) { return("further")
     } else { return("closer") }
