@@ -20,6 +20,7 @@ var MultivarCrossover = Backbone.Model.extend({
 				'equations.scen':base.selectEqns([base.get('scens')[1]]),
 				'equations.baseline':base.selectEqns([base.get('scens')[0]]),
 				'var':this.get("output"),
+        'bounds':'opt_cor',
 				ranges:ranges
 		},function(result){
 			model.set("multivar_result",result)
