@@ -1,6 +1,6 @@
 getCombinedCSV<-function(url){
-  if(missing(url)){ 
-    x=read.csv(system.file("www/mar1_combined.csv",package="breakdown",mustWork=TRUE),
+  if(dirname(url)=="."){ 
+    x=read.csv(system.file(sprintf("www/%s",url),package="breakdown",mustWork=TRUE),
                stringsAsFactors=FALSE,header=FALSE,sep=";")
   } else {
     x=read.csv(url,stringsAsFactors=FALSE,header=FALSE,sep=";")

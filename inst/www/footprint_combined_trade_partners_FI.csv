@@ -1,0 +1,58 @@
+Variable;Lower;Min;Best;Max;Upper;bestguess;bounds;direction;is.problem;OD;RD;A50;A25;A12.5;A0
+total.water.footprint;;;;;;;;;;total.green.footprint+total.blue.footprint;total.green.footprint+total.blue.footprint;total.green.footprint+total.blue.footprint;total.green.footprint+total.blue.footprint;total.green.footprint+total.blue.footprint;total.green.footprint+total.blue.footprint
+total.green.footprint;;;;;;;;;;sum(diet*greenfplg);sum(diet*greenfplg);sum(diet*greenfplg);sum(diet*greenfplg);sum(diet*greenfplg);sum(diet*greenfplg)
+total.blue.footprint;;;;;;;;;;sum(diet*bluefplg);sum(diet*bluefplg);sum(diet*bluefplg);sum(diet*bluefplg);sum(diet*bluefplg);sum(diet*bluefplg)
+diet;;;;;;;;;;"c(beverages, cereals, eggs, fish, fruits_vegs, meat, 
+milk, oil, oilseeds, roots, spices, stimulants, 
+sugar)";"c(beverages, cereals, eggs, fish, fruits_vegs, meat, 
+milk, oil, oilseeds, roots, spices, stimulants, 
+sugar)";"c(beverages, cereals, eggs, fish, fruits_vegs, meat, 
+milk, oil, oilseeds, roots, spices, stimulants, 
+sugar)";"c(beverages, cereals, eggs, fish, fruits_vegs, meat, 
+milk, oil, oilseeds, roots, spices, stimulants, 
+sugar)";"c(beverages, cereals, eggs, fish, fruits_vegs, meat, 
+milk, oil, oilseeds, roots, spices, stimulants, 
+sugar)";"c(beverages, cereals, eggs, fish, fruits_vegs, meat, 
+milk, oil, oilseeds, roots, spices, stimulants, 
+sugar)"
+greenfplg;;;;;;;;;;c(greenfp_beverages, greenfp_cereals, greenfp_eggs, greenfp_fish, greenfp_fruits_vegs, greenfp_meat, greenfp_milk, greenfp_oil, greenfp_oilseeds, greenfp_roots, greenfp_spices, greenfp_stimulants, greenfp_sugar);c(greenfp_beverages, greenfp_cereals, greenfp_eggs, greenfp_fish, greenfp_fruits_vegs, greenfp_meat, greenfp_milk, greenfp_oil, greenfp_oilseeds, greenfp_roots, greenfp_spices, greenfp_stimulants, greenfp_sugar);c(greenfp_beverages, greenfp_cereals, greenfp_eggs, greenfp_fish, greenfp_fruits_vegs, greenfp_meat, greenfp_milk, greenfp_oil, greenfp_oilseeds, greenfp_roots, greenfp_spices, greenfp_stimulants, greenfp_sugar);c(greenfp_beverages, greenfp_cereals, greenfp_eggs, greenfp_fish, greenfp_fruits_vegs, greenfp_meat, greenfp_milk, greenfp_oil, greenfp_oilseeds, greenfp_roots, greenfp_spices, greenfp_stimulants, greenfp_sugar);c(greenfp_beverages, greenfp_cereals, greenfp_eggs, greenfp_fish, greenfp_fruits_vegs, greenfp_meat, greenfp_milk, greenfp_oil, greenfp_oilseeds, greenfp_roots, greenfp_spices, greenfp_stimulants, greenfp_sugar);c(greenfp_beverages, greenfp_cereals, greenfp_eggs, greenfp_fish, greenfp_fruits_vegs, greenfp_meat, greenfp_milk, greenfp_oil, greenfp_oilseeds, greenfp_roots, greenfp_spices, greenfp_stimulants, greenfp_sugar)
+bluefplg;;;;;;;;;;c(bluefp_beverages, bluefp_cereals, bluefp_eggs, bluefp_fish, bluefp_fruits_vegs, bluefp_meat, bluefp_milk, bluefp_oil, bluefp_oilseeds, bluefp_roots, bluefp_spices, bluefp_stimulants, bluefp_sugar);c(bluefp_beverages, bluefp_cereals, bluefp_eggs, bluefp_fish, bluefp_fruits_vegs, bluefp_meat, bluefp_milk, bluefp_oil, bluefp_oilseeds, bluefp_roots, bluefp_spices, bluefp_stimulants, bluefp_sugar);c(bluefp_beverages, bluefp_cereals, bluefp_eggs, bluefp_fish, bluefp_fruits_vegs, bluefp_meat, bluefp_milk, bluefp_oil, bluefp_oilseeds, bluefp_roots, bluefp_spices, bluefp_stimulants, bluefp_sugar);c(bluefp_beverages, bluefp_cereals, bluefp_eggs, bluefp_fish, bluefp_fruits_vegs, bluefp_meat, bluefp_milk, bluefp_oil, bluefp_oilseeds, bluefp_roots, bluefp_spices, bluefp_stimulants, bluefp_sugar);c(bluefp_beverages, bluefp_cereals, bluefp_eggs, bluefp_fish, bluefp_fruits_vegs, bluefp_meat, bluefp_milk, bluefp_oil, bluefp_oilseeds, bluefp_roots, bluefp_spices, bluefp_stimulants, bluefp_sugar);c(bluefp_beverages, bluefp_cereals, bluefp_eggs, bluefp_fish, bluefp_fruits_vegs, bluefp_meat, bluefp_milk, bluefp_oil, bluefp_oilseeds, bluefp_roots, bluefp_spices, bluefp_stimulants, bluefp_sugar)
+bluefp_beverages;0;0.000003;0.04622329;0.24;0.4622329;;;;;0.04622329;0.04622329;0.04622329;0.04622329;0.04622329;0.04622329
+bluefp_cereals;0;0.0067;0.365280098;0.71;3.65280098;;adjusted down from 1.66;;;0.365280098;0.365280098;0.365280098;0.365280098;0.365280098;0.365280098
+bluefp_eggs;0;0.011;0.016598386;0.1;0.16598386;;;;;0.016598386;0.016598386;0.016598386;0.016598386;0.016598386;0.016598386
+bluefp_fish;0;0.13;0.19798142;0.13;1.9798142;;;;;0.19798142;0.19798142;0.19798142;0.19798142;0.19798142;0.19798142
+bluefp_fruits_vegs;0;0.003;0.131445406;0.32;1.31445406;;;;;0.131445406;0.131445406;0.131445406;0.131445406;0.131445406;0.131445406
+bluefp_meat;0;0.061;0.127182534;0.78;1.27182534;;;;;0.127182534;0.127182534;0.127182534;0.127182534;0.127182534;0.127182534
+bluefp_milk;0;0.016;0.018233596;0.31;0.18233596;;;;;0.018233596;0.018233596;0.018233596;0.018233596;0.018233596;0.018233596
+bluefp_oil;0;0.028;0.373445804;0.52;3.73445804;;;;;0.373445804;0.373445804;0.373445804;0.373445804;0.373445804;0.373445804
+bluefp_oilseeds;0;0.033;0.594073058;2.3;5.94073058;;;;;0.594073058;0.594073058;0.594073058;0.594073058;0.594073058;0.594073058
+bluefp_roots;0;0.00014;0.008084891;0.061;0.08084891;;;;;0.008084891;0.008084891;0.008084891;0.008084891;0.008084891;0.008084891
+bluefp_spices;0;0.053;0.596479092;2;5.96479092;;;;;0.596479092;0.596479092;0.596479092;0.596479092;0.596479092;0.596479092
+bluefp_stimulants;0;0.0011;0.186298281;5.1;1.86298281;;;;;0.186298281;0.186298281;0.186298281;0.186298281;0.186298281;0.186298281
+bluefp_sugar;0;0.022;0.445739176;0.78;4.45739176;;;;;0.445739176;0.445739176;0.445739176;0.445739176;0.445739176;0.445739176
+greenfp_beverages;0;0.046;0.2862846;0.54;2.862846;;;;;0.2862846;0.2862846;0.2862846;0.2862846;0.2862846;0.2862846
+greenfp_cereals;0;0.26;1.2305218;2.7;12.305218;;Maximum currently calculated is 9.76 kL/kg in Niger, but also quite high >3 in many other equatorial countries;Increase in cereal footprint decreases its advantage over meat.;;1.2305218;1.2305218;1.2305218;1.2305218;1.2305218;1.2305218
+greenfp_eggs;0;0.99;1.6644139;6.3;16.644139;;;;;1.6644139;1.6644139;1.6644139;1.6644139;1.6644139;1.6644139
+greenfp_fish;0;0;2.173854;0;21.73854;;;;;2.173854;2.173854;2.173854;2.173854;2.173854;2.173854
+greenfp_fruits_vegs;0;0.054;0.472743;2.3;4.72743;;adjusted;;;0.472743;0.472743;0.472743;0.472743;0.472743;0.472743
+greenfp_meat;0;1.3;3.6019914;6.4;36.019914;;;;;3.6019914;3.6019914;3.6019914;3.6019914;3.6019914;3.6019914
+greenfp_milk;0;0.3;0.6184489;2.5;6.184489;;;;;0.6184489;0.6184489;0.6184489;0.6184489;0.6184489;0.6184489
+greenfp_oil;0;1.7;5.0098534;6.4;50.098534;;;;;5.0098534;5.0098534;5.0098534;5.0098534;5.0098534;5.0098534
+greenfp_oilseeds;0;1.2;5.3325931;15;53.325931;;;;;5.3325931;5.3325931;5.3325931;5.3325931;5.3325931;5.3325931
+greenfp_roots;0;0.052;0.1463762;0.24;1.463762;;;;;0.1463762;0.1463762;0.1463762;0.1463762;0.1463762;0.1463762
+greenfp_spices;0;1.7;2.700426;13;27.00426;;;;;2.700426;2.700426;2.700426;2.700426;2.700426;2.700426
+greenfp_stimulants;0;3.9;18.9352107;23;189.352107;;;;;18.9352107;18.9352107;18.9352107;18.9352107;18.9352107;18.9352107
+greenfp_sugar;0;0.23;1.5334882;2;15.334882;;;;;1.5334882;1.5334882;1.5334882;1.5334882;1.5334882;1.5334882
+beverages;;;;;;;;;;207.6016316;207.6016316;207.5895571;207.6016159;205.2364511;203.9653022
+cereals;;;;;;;;;;216.9155182;321.4987049;321.5234345;421.8242222;466.4120365;484.2208362
+eggs;;;;;;;;;;21.6064576;21.29344306;21.29334536;20.1149977;17.81131909;0
+fish;;;;;;;;;;81.5299333;81.52993322;81.52230795;81.52993319;81.52993321;81.52993329
+fruits_vegs;;;;;;;;;;339.7140028;388.9819124;389.0039646;399.2518582;400.3028775;402.6257327
+meat;;;;;;;;;;180.0169175;111.4307572;111.4237512;24.26433039;20.4771984;0
+milk;;;;;;;;;;961.7960249;761.6576606;761.6153888;390.8969301;177.0335879;0
+oil;;;;;;;;;;29.2153476;20.12640792;20.12537874;19.93719703;19.49987003;25.16987293
+oilseeds;;;;;;;;;;11.1145344;11.01808763;11.01805568;23.89864831;24.208899;33.90892089
+roots;;;;;;;;;;148.5000064;160.5875971;160.5892042;281.2511452;282.4598533;342.3481721
+spices;;;;;;;;;;0.6351163;0.635114712;0.634940636;0.634931076;0.634716234;0.635109894
+stimulants;;;;;;;;;;29.6460002;29.51737444;29.51729577;29.64599994;29.64600001;29.64600021
+sugar;;;;;;;;;;64.6380005;63.75;63.74462388;62.84676812;60.97590674;60.33776369

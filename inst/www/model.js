@@ -499,8 +499,7 @@ var SelectOutput = Backbone.View.extend({
 
 
 loadDemo=function(model,url){
-	opts={};
-	if(!url) opts={url:url}
+	opts={url:url}
 	var req=ocpu.rpc("getCombinedCSV",opts,function(data){ 
 		console.log('loadDemo');
 		model.AllFromCSV(data);
