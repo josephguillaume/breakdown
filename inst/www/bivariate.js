@@ -9,7 +9,7 @@ var BivariateAnalysis = Backbone.Model.extend({
 	},
 	initialize:function(){
 		if(!this.get('output')) this.listenTo(this.get("base"),'change:output_var', 
-			function(){this.set('output',this.get("base").get('output_var'))}, this);
+			function(){this.set('output',this.get("base").get('output_var'));}, this);
 		//bivariateCrossover is called if any of the attributes change
 		this.on('change:n',this.bivariateCrossover,this);
 		this.on('change:vars',this.bivariateCrossover,this);
@@ -32,8 +32,17 @@ var BivariateAnalysis = Backbone.Model.extend({
 				ranges:ranges,
 				n:this.get("n")
 		},function(session){
-			biv.set("bivariate_result",session)
-		})
+			biv.set("bivariate_result",session);
+		});
+		req.fail(function(){
+			$.messager.show({
+					title:'Error',
+					msg:req.responseText,
+					timeout:5000,
+					showType:'slide'
+					});
+			biv.set('bivariate_result',null);
+		});		
 	}
 });
 
@@ -44,7 +53,7 @@ var BivOutputPlot = Backbone.View.extend({
 		this.listenTo(this.model,'change:flip', this.actual_render, this);
 		//TODO: changing Min,Max,Best should just involve new plot
 		var obj=this;
-		this.$el.resizable({onStopResize:function(){obj.actual_render()}});
+		this.$el.resizable({onStopResize:function(){obj.actual_render();}});
 	},
     render: function() {
 		if(!this.$el.is(":visible")) return this;
@@ -54,11 +63,14 @@ var BivOutputPlot = Backbone.View.extend({
 		console.log("BivOutputPlot render");
 		var ranges=this.model.get("base").getRanges(this.model.get("vars"),false);
 		var req=this.$el.rplot("biplot",{
-					pom:pom,
-					ranges:ranges,
-					flip:this.model.get("flip")
-		})
-		req.fail(function(){console.log(req.responseText)});
+					'pom':pom,
+					'ranges':ranges,
+					'flip':this.model.get("flip"),
+					'equations':this.model.get("base").selectEqns(this.model.get("base").get("scens")),
+					'var':this.model.get("output"),
+					'scens':[this.model.get("header")[this.model.get("scens")[0]],this.model.get("header")[this.model.get("scens")[1]]]
+		});
+		req.fail(function(){console.log(req.responseText);});
 		var view=this;
 		req.done(function(){
 			view.dirty=false;
@@ -90,7 +102,7 @@ var BivRadioButtonTable = Backbone.View.extend({
 			this.model.get('vars')[1] + '"]').prop('checked', true);
 	},
     render: function() {
-		console.log("render BivRadioButtonTable")
+		console.log("render BivRadioButtonTable");
 		var model=this.model;
 		var ranges=model.get("base").get('ranges');
 		// Call template
@@ -103,9 +115,9 @@ var BivRadioButtonTable = Backbone.View.extend({
 		this.sliders.render();
 		//should be listenTo?
 		this.$el.find("input:radio[name='"+this.inputId+"']").on('change',function(){
-			model.set('vars',[this.value,model.get('vars')[1]])});
+			model.set('vars',[this.value,model.get('vars')[1]]);});
 		this.$el.find("input:radio[name='"+this.inputId2+"']").on('change',function(){
-			model.set('vars',[model.get('vars')[0],this.value])});
+			model.set('vars',[model.get('vars')[0],this.value]);});
 		this.setselected();
 		return this;
 	}
