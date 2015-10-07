@@ -1,10 +1,10 @@
 
 // http://mounirmesselmeni.github.io/2012/11/20/javascript-csv/
 readCsv = function(files,handler,separator){
-	if(!separator) separator=","
+	if(!separator) separator=",";
 	if (window.FileReader) {
 		var reader = new FileReader();
-		if(files.length==0) return null;
+		if(files.length===0) return null;
 		reader.readAsText(files[0]);
 		reader.onload = function(event){
 			//http://code.google.com/p/jquery-csv/downloads/list
@@ -13,7 +13,7 @@ readCsv = function(files,handler,separator){
 				//console.log(result);
 				handler(result);
 			} catch(err){
-				alert(err.message)
+				alert(err.message);
 			}
 		};
 		reader.onerror = function(event){
@@ -24,7 +24,7 @@ readCsv = function(files,handler,separator){
     } else {
         alert('FileReader are not supported in this browser.');
     }
-}
+};
 
 var Note = Backbone.Model.extend({
 	defaults:{
@@ -55,7 +55,7 @@ var Analysis = Backbone.Model.extend({
 	},
 	EquationsfromCSV:function(csv){
 		console.log("EquationsfromCSV");
-		this.set('header',csv[0])
+		this.set('header',csv[0]);
 		csv.splice(0,1); //remove header
 		this.set('equations',csv);
 		return this;
@@ -70,12 +70,12 @@ var Analysis = Backbone.Model.extend({
 		var equations=csv.map(function(x){
 			var row=x.slice(10,csv[0].length);
 			row.unshift(x[0]);
-			return row
+			return row;
 		});
 		equations.splice(0,1); //remove header
 		this.set('equations',equations);
 		//Default output variable is NPV
-		var idx=this.get('equations').map(function(x){return x[0]}).indexOf('NPV');
+		var idx=this.get('equations').map(function(x){return x[0];}).indexOf('NPV');
 		if(idx>1) this.set('output_var','NPV');
 		//Ranges
 		var ranges=csv.map(function(x){
@@ -83,9 +83,9 @@ var Analysis = Backbone.Model.extend({
 		});
 		ranges.splice(0,1); //remove header
 		//remove empty rows
-		ranges=ranges.filter(function(v,i){return v[1]!=""|v[2]!=""|v[3]!=""|v[4]!=""|v[5]!=""});
+		ranges=ranges.filter(function(v,i){return v[1]!==""|v[2]!==""|v[3]!==""|v[4]!==""|v[5]!=="";});
 		this.set('ranges',ranges);
-		if(this.get('selected_var1')==null) this.set('selected_var1',ranges[0][0]);
+		if(this.get('selected_var1')===null) this.set('selected_var1',ranges[0][0]);
 		// Notes
 		notes=this.get('notes');
 		csv.map(function(x){
@@ -104,9 +104,9 @@ var Analysis = Backbone.Model.extend({
 	AllToCSV:function(){
 		// Merge equations,notes,ranges
 		var eqns=this.get('equations').map(function(arr){return arr.slice();});
-		var vars_eqns=eqns.map(function(x){return x[0]});
+		var vars_eqns=eqns.map(function(x){return x[0];});
 		var ranges=this.get('ranges').map(function(arr){return arr.slice();});
-		var vars_ranges=ranges.map(function(x){return x[0]});
+		var vars_ranges=ranges.map(function(x){return x[0];});
 		var head_eqns=this.get("header").slice();
 		head_eqns.splice(0,1);
 		var out=[[].concat(
@@ -130,18 +130,18 @@ var Analysis = Backbone.Model.extend({
 			if(idx_ranges > -1){
 				row_ranges=ranges[idx_ranges].slice();
 				row_ranges.splice(0,1);
-				for(i=0;i<5;i++){if(!row_ranges[i]){row_ranges[i]=""}}
+				for(i=0;i<5;i++){if(!row_ranges[i]){row_ranges[i]="";}}
 			}
 			out.push([].concat([var_name],row_ranges,row_notes,row_eqns));
 		});
-		var csv=out.map(function(row){return row.map(function(x){return '"'+(x+'').replace(/"/g,'""')+'"'}).join(";")}).join("\n");
-		return csv
+		var csv=out.map(function(row){return row.map(function(x){return '"'+(x+'').replace(/"/g,'""')+'"';}).join(";");}).join("\n");
+		return csv;
 	},
 	delVar:function(variable,dgname){
 		console.log('delVar '+variable+' in '+dgname);
-		if(variable==undefined) return(this);
+		if(variable===undefined) return(this);
 		var vals=this.get(dgname).slice(0); //clone, because otherwise this bypasses set
-		var i=vals.map(function(x){return(x[0])}).indexOf(variable);
+		var i=vals.map(function(x){return(x[0]);}).indexOf(variable);
 		vals.splice(i,1);
 		this.set(dgname,vals);
 		if(variable==this.selected_var1) this.set("selected_var1",null);
@@ -150,7 +150,7 @@ var Analysis = Backbone.Model.extend({
 	selectEqns:function(indices){
 		var eqns=this.get('equations').map(function(x){
 			// For each row, return name and desired indices
-			var row=indices.map(function(i){return x[i]});
+			var row=indices.map(function(i){return x[i];});
 			row.unshift(x[0]);
 			return row;
 		});
@@ -159,48 +159,48 @@ var Analysis = Backbone.Model.extend({
 	getRanges:function(vars,asArray){
 		if(!vars) return(null);
 		asArray = typeof asArray !== 'undefined' ? asArray : true;
-		if(!$.isArray(vars)) var vars=[vars];
+		if(!$.isArray(vars)) vars=[vars];
 		var ranges=this.get('ranges').map(function(arr){return arr.slice();});
 		ranges=$.grep(ranges,function(e,i){
 				// Return appropriate elements
 				return($.inArray(e[0],vars)>-1);
-			})
-		if(asArray){ return(ranges) };
+			});
+		if(asArray){ return(ranges); }
 		ranges = {
-			Variable:ranges.map(function(x){return x[0]}),
-			Lower:ranges.map(function(x){return parseFloat(x[1])}),
-			Min:ranges.map(function(x){return parseFloat(x[2])}),
-			Best:ranges.map(function(x){return parseFloat(x[3])}),
-			Max:ranges.map(function(x){return parseFloat(x[4])}),
-			Upper:ranges.map(function(x){return parseFloat(x[5])}),
+			Variable:ranges.map(function(x){return x[0];}),
+			Lower:ranges.map(function(x){return parseFloat(x[1]);}),
+			Min:ranges.map(function(x){return parseFloat(x[2]);}),
+			Best:ranges.map(function(x){return parseFloat(x[3]);}),
+			Max:ranges.map(function(x){return parseFloat(x[4]);}),
+			Upper:ranges.map(function(x){return parseFloat(x[5]);}),
 		};
 		return ranges;
 	},	
 	normalise:function(x,variable){
 		val=parseFloat(x);
 		ranges=_.object(this.get("ranges_cols"),this.getRanges(variable)[0]);
-		if(!$.isNumeric(ranges.Best)) return(NaN)
-		if(!$.isNumeric(ranges.Min)) return(NaN)
-		if(!$.isNumeric(ranges.Max)) return(NaN)
-		if(Math.abs(x-ranges.Best) < 1e-5){return(0)}
-		if(x>ranges.Best){return (x-ranges.Best)/(ranges.Max-ranges.Best)}
-		if(x<ranges.Best){return (ranges.Best-x)/(ranges.Best-ranges.Min)}
+		if(!$.isNumeric(ranges.Best)) return(NaN);
+		if(!$.isNumeric(ranges.Min)) return(NaN);
+		if(!$.isNumeric(ranges.Max)) return(NaN);
+		if(Math.abs(x-ranges.Best) < 1e-5){return(0);}
+		if(x>ranges.Best){return (x-ranges.Best)/(ranges.Max-ranges.Best);}
+		if(x<ranges.Best){return (ranges.Best-x)/(ranges.Best-ranges.Min);}
 	},
 	evaluate:function(column,variable){
-		if(this.get('equations').length==0) return(this)
+		if(this.get('equations').length===0) return(this);
 		//get named vector of equations for the column
 		dict={};
 		for(i=0;i<this.get('equations').length;i++){
-			dict[this.get('equations')[i][0]]=this.get('equations')[i][column]
+			dict[this.get('equations')[i][0]]=this.get('equations')[i][column];
 		}
 		var model=this;
 		var req=ocpu.rpc("evaluate",{expr:variable,equations:dict},function(data){ 
 			console.log('evaluate is setting '+variable+' for column '+column);
 			var vals=model.get(variable).slice(0); //clone, because otherwise this bypasses set
-			if(vals==undefined) vals=[];
+			if(vals===undefined) vals=[];
 			vals[column]=data[0]; //assuming its a scalar
 			model.set(variable,vals);
-		})
+		});
 		req.fail(function(){
 			$.messager.show({
 					title:'Error',
@@ -209,7 +209,7 @@ var Analysis = Backbone.Model.extend({
 					showType:'slide'
 					});
 			var vals=model.get(variable).slice(0);
-			if(vals==undefined) vals=[];
+			if(vals===undefined) vals=[];
 			vals[column]=NaN;
 			model.set(variable,vals);
 		});
@@ -227,7 +227,7 @@ var SingleOutputPlot = Backbone.View.extend({
 		this.model.on('change:selected_var1',this.actual_render,this);
 		this.model.on('change:scens',this.actual_render,this);
 		var obj=this;
-		this.$el.resizable({onStopResize:function(){obj.actual_render()}});
+		this.$el.resizable({onStopResize:function(){obj.actual_render();}});
 	},
 	refresh_output:function(){
 		this.output=this.model.get('output_var');
@@ -241,7 +241,7 @@ var SingleOutputPlot = Backbone.View.extend({
 		var model=this.model;
 		if(!model || !model.get("selected_var1")) return(this);
 		var ranges0=model.getRanges(model.get("selected_var1"));
-		if(ranges0.length==0){
+		if(ranges0.length===0){
 			$.messager.show({
 			title:'Error',
 			msg:"Range not found for variable "+model.get("selected_var1"),
@@ -250,12 +250,13 @@ var SingleOutputPlot = Backbone.View.extend({
 			});
 			return(this);
 		}
+		//Convert to named object
 		ranges0=_.object(model.get("ranges_cols"),ranges0[0]);
 		var req = this.$el.rplot("plotNPV",{					
 					equations:model.selectEqns(model.get('scens')),
 					x:model.get("selected_var1"),y:this.output,
 					ranges0:ranges0,
-					scens:model.get("scens").map(function(i){return model.get('header')[i]})
+					scens:model.get("scens").map(function(i){return model.get('header')[i];})
 				});
 		var view=this;
 		req.done(function(){
@@ -273,7 +274,7 @@ var OutputStats = Backbone.View.extend({
     initialize: function(args){
 		this.variable=args.variable;
 		//if values doesn't exist yet, set it
-		if(this.model.get(this.variable)==undefined) {
+		if(this.model.get(this.variable)===undefined) {
 			this.model.set(this.variable,[NaN,NaN,NaN]);
 		}
 		this.listenTo(this.model,'change:'+this.variable, this.render, this);	
@@ -307,30 +308,30 @@ var OutputStats = Backbone.View.extend({
 setDefault=function(model){
 	var req=ocpu.rpc("getBottom",{equations:model.get("equations")},function(data){ 
 		var ranges=model.get('ranges').map(function(arr){return arr.slice();});
-		var current_names=ranges.map(function(x){return x[0]});
-		var new_names = _.filter(data,function(v){return !_.contains(current_names,v)})
-		var new_items=new_names.map(function(v){return [v]});
+		var current_names=ranges.map(function(x){return x[0];});
+		var new_names = _.filter(data,function(v){return !_.contains(current_names,v);});
+		var new_items=new_names.map(function(v){return [v];});
 		var eqns=model.get('equations');
 		$.each(eqns,function(i,v){
 			w=new_names.indexOf(v[0]);
 			if(w > -1 && !isNaN(parseFloat(v[1]))){
-				new_items[w][3]=v[1]
-				new_items[w][1]=v[1]*0.01
-				new_items[w][5]=v[1]*10
+				new_items[w][3]=v[1];
+				new_items[w][1]=v[1]*0.01;
+				new_items[w][5]=v[1]*10;
 			}
 		});
 		ranges=ranges.concat(new_items);
 		model.set('ranges',ranges);
 	});
-	req.fail(function(){console.log(req.responseText)});
-}
+	req.fail(function(){console.log(req.responseText);});
+};
 
 
 var editRange_placeholder=function(this_var){
 	//TODO
 	$('#win').html(analysis.getRanges(this_var));
 	$('#win').window('open');
-}
+};
 			
 			
 // Creates a complete set of sliders - can't change each variable separately anyway in model,
@@ -360,7 +361,7 @@ var RangeSliders = Backbone.View.extend({
 			if(isNaN(range.Max)) range.Max=range.Upper;
 			//Define scale
 			var scale=[];
-			for (var i = 0; i <= 15+1; i++) {scale.push("|");};
+			for (var i = 0; i <= 15+1; i++) {scale.push("|");}
 			scale[Math.round((range.Best[0]-range.Lower[0])/(range.Upper[0]-range.Lower[0])*15.0)+1]=range.Best;
 			
 			$(this).slider({ range:true, from: range.Lower[0], to: range.Upper[0], step: (range.Upper[0]-range.Lower[0])/250, round: false, 
@@ -368,20 +369,20 @@ var RangeSliders = Backbone.View.extend({
 				callback:function(value){
 					//Edit model's ranges and reset it
 					var data=model.get('ranges').map(function(arr){return arr.slice();});
-					index=data.map(function(x){return x[0]}).indexOf(id);
+					index=data.map(function(x){return x[0];}).indexOf(id);
 					var vals = value.split(/;/, 2);
 					data[index][model.get("ranges_cols").indexOf("Min")]=vals[0];
 					data[index][model.get("ranges_cols").indexOf("Max")]=vals[1];
 					model.set('ranges',data);
 				}
-			})
+			});
 			$(this).slider("value",range.Min[0],range.Max[0]);
-			$(this).next(".jslider").find(".jslider-value-to").on('click',function(){editRange(id)});
-			$(this).next(".jslider").find(".jslider-value").on('click',function(){editRange(id)});
-			$(this).next(".jslider").find(".jslider-label-to").on('click',function(){editRange(id)});
-			$(this).next(".jslider").find(".jslider-label").on('click',function(){editRange(id)});
-			$(this).next(".jslider").find(".jslider-scale span:not(:empty())").on('click',function(){editRange(id)});
-		})
+			$(this).next(".jslider").find(".jslider-value-to").on('click',function(){editRange(id);});
+			$(this).next(".jslider").find(".jslider-value").on('click',function(){editRange(id);});
+			$(this).next(".jslider").find(".jslider-label-to").on('click',function(){editRange(id);});
+			$(this).next(".jslider").find(".jslider-label").on('click',function(){editRange(id);});
+			$(this).next(".jslider").find(".jslider-scale span:not(:empty())").on('click',function(){editRange(id);});
+		});
 		return this;
 	}
 });
@@ -389,8 +390,8 @@ var RangeSliders = Backbone.View.extend({
 
 downloadCSV=function(model){
 	var data=model.AllToCSV();
-	window.open('data:text/csv;charset=utf8,' + encodeURIComponent(data))
-}
+	window.open('data:text/csv;charset=utf8,' + encodeURIComponent(data));
+};
 
 var SelectScens = Backbone.View.extend({
 	//model is an Analysis
@@ -404,9 +405,9 @@ var SelectScens = Backbone.View.extend({
 	render: function(){
 		var model=this.model;
 		var view=this;
-		var opts=model.get("header").map(function(e,i){return {id:i,text:e}})
+		var opts=model.get("header").map(function(e,i){return {id:i,text:e};});
 		opts.splice(0,1);
-		if(opts.length==0) opts=[{id:1,text:""},{id:2,text:""}];
+		if(opts.length===0) opts=[{id:1,text:""},{id:2,text:""}];
 		this.$el.combobox({
 			valueField:'id',
 			textField:'text',
@@ -414,7 +415,7 @@ var SelectScens = Backbone.View.extend({
 			data:opts,
 			onChange:function(oldval,newval){
 				if(oldval==newval) return null;
-				if(newval=="") return null;
+				if(newval==="") return null;
 				if(!newval) return null;
 				if(!isNaN(parseInt(newval))) return null;
 				var idx=model.get("header").indexOf(newval);
@@ -447,7 +448,7 @@ addScens=function(model,scen_vals){
 			//create a blank column
 			//change directly to not trigger events
 			var equations=model.get('equations');
-			for(i=0;i<equations.length;i++){if(!equations[i][newidx]){equations[i][newidx]=""}}
+			for(i=0;i<equations.length;i++){if(!equations[i][newidx]){equations[i][newidx]="";}}
 			//then add it to the header
 			header.push(e);
 			model.set('header',header);
@@ -468,8 +469,8 @@ var SelectOutput = Backbone.View.extend({
 	render: function(){
 		var model=this.model;
 		var view=this;
-		var opts=model.get('equations').map(function(x){return {text:x[0]}})
-		if(opts.length==0) opts=[{text:""}];
+		var opts=model.get('equations').map(function(x){return {text:x[0]};});
+		if(opts.length===0) opts=[{text:""}];
 		this.$el.combobox({
 			valueField:'text',
 			textField:'text',
@@ -477,9 +478,9 @@ var SelectOutput = Backbone.View.extend({
 			data:opts,
 			onChange:function(oldval,newval){
 				if(oldval==newval) return null;
-				if(newval=="") return null;
+				if(newval==="") return null;
 				if(!newval) return null;
-				var idx=model.get('equations').map(function(x){return x[0]}).indexOf(newval);
+				var idx=model.get('equations').map(function(x){return x[0];}).indexOf(newval);
 				if(idx>0){
 					view.$el.next().find("input").toggleClass("unknown-scen",false);
 					model.set('output_var',newval);
@@ -499,12 +500,12 @@ var SelectOutput = Backbone.View.extend({
 
 
 loadDemo=function(model,url){
-	opts={url:url}
+	opts={url:url};
 	var req=ocpu.rpc("getCombinedCSV",opts,function(data){ 
 		console.log('loadDemo');
 		model.AllFromCSV(data);
-	})
-}
+	});
+};
 
 var EditableNote = Backbone.View.extend({
 	//model is an Analysis
@@ -528,15 +529,15 @@ var EditableNote = Backbone.View.extend({
 		this.render();
 	},
 	render: function(){
-		if(this.model.get('selected_var1')==null){
+		if(this.model.get('selected_var1')===null){
 			this.$el.editable('disable');
-			return this
+			return this;
 		} else {
 			this.$el.editable('enable');
 		}
 		var note=this.model.get('notes').get(this.model.get('selected_var1'));
 		//console.log(note);
-		if (note==null) note = this.model.get('notes').add({id:this.model.get('selected_var1')});
+		if (note===null) note = this.model.get('notes').add({id:this.model.get('selected_var1')});
 		this.$el.editable('setValue',note.get(this.field));
 		return this;
 	}
@@ -549,9 +550,9 @@ var EditBounds = Backbone.View.extend({
 		this.listenTo(this.model,'change:ranges', this.render, this);
 	},
 	render: function(){
-		if(this.model.get('selected_var1')==null) return this;
+		if(this.model.get('selected_var1')===null) return this;
 		var ranges=this.model.getRanges(this.model.get('selected_var1'),false);
-		this.$el.find(".xeditable").editable('destroy')
+		this.$el.find(".xeditable").editable('destroy');
 		this.$el.html(_.template($("#EditBounds_template").html(),{
 			variable:ranges.Variable[0],
 			Best:ranges.Best[0],
@@ -566,11 +567,11 @@ var EditBounds = Backbone.View.extend({
 				//console.log('EditBounds for '+view.model.get('selected_var1'));
 				var data=model.get('ranges').map(function(arr){return arr.slice();});
 				//TODO: should be data-pk instead?
-				var row=data.map(function(x){return x[0]}).indexOf(model.get('selected_var1'));
+				var row=data.map(function(x){return x[0];}).indexOf(model.get('selected_var1'));
 				var col=({Best:3,Min:2,Max:4})[$(this).data('name')];
 				data[row][col]=newValue;
 				model.set('ranges',data);
-			}})
+			}});
 		return this;
 	}
 });
