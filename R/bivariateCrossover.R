@@ -20,3 +20,16 @@ bivariateCrossover <-
     colnames(mm) <- ranges$Variable
     mm
   }
+
+#In order of decreasing value of var
+#TODO: use Best from ranges rather than default
+orderScensAtBestGuess <-
+  function(equations,var,scens){
+    stopifnot(length(scens)==ncol(equations)-1)
+    vals=sapply(2:ncol(equations),function(i) {
+      eqs=equations[,i]
+      names(eqs)=equations[,1]
+      evaluate(var,eqs)
+    })
+    scens[order(vals,decreasing=T)]
+  }
