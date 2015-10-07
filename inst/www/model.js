@@ -240,8 +240,8 @@ var SingleOutputPlot = Backbone.View.extend({
 		console.log("render SingleOutputPlot");
 		var model=this.model;
 		if(!model || !model.get("selected_var1")) return(this);
-		var ranges0=model.getRanges(model.get("selected_var1"));
-		if(ranges0.length===0){
+		var ranges0=model.getRanges(model.get("selected_var1"),false);
+		if(ranges0.Variable.length===0){
 			$.messager.show({
 			title:'Error',
 			msg:"Range not found for variable "+model.get("selected_var1"),
@@ -250,8 +250,6 @@ var SingleOutputPlot = Backbone.View.extend({
 			});
 			return(this);
 		}
-		//Convert to named object
-		ranges0=_.object(model.get("ranges_cols"),ranges0[0]);
 		var req = this.$el.rplot("plotNPV",{					
 					equations:model.selectEqns(model.get('scens')),
 					x:model.get("selected_var1"),y:this.output,

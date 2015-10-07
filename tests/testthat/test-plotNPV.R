@@ -5,10 +5,6 @@ equations=combined[-1,c(1,11:ncol(combined))]
 header=combined[1,c(1,11:ncol(combined))]
 ranges=combined[,1:6]
 
-ranges0=ranges[ranges[,1]=="greenfp_cereals",]
-names(ranges0)<-c("Variable","Lower","Min","Best","Max","Upper")
-ranges0.text=ranges0
-
 ranges.df=as.data.frame(ranges[-1,],stringsAsFactors=F)
 for(i in 2:6) ranges.df[,i]=as.numeric(ranges.df[,i])
 names(ranges.df)<-c("Variable","Lower","Min","Best","Max","Upper")
@@ -18,9 +14,6 @@ ranges0=subset(ranges.df,Variable=="greenfp_cereals")
 context("plotNPV")
 
 test_that("supports different input formats",{
-  #TODO: univariateCrossover requires data.frame, but plotNPV is ok with vector
-  #pp=plotNPV(equations[,c(1,3,7)],"greenfp_cereals","total.water.footprint",ranges0.text,c("RD","A0"))
-
   pp=plotNPV(equations[,c(1,3,7,6)],"greenfp_cereals","total.water.footprint",ranges0.text,header[c(3,7,6)])
   expect_equal(length(pp$layers),6) #3 lines, No annotations
   

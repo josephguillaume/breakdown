@@ -65,8 +65,10 @@ plotNPV<-function(equations,x,y,ranges0,scens){
                                                       x,crossover+0.01*(ranges0$Upper-ranges0$Lower)))))
       
       #Add to plot
-      p=p+annotate("text",x=crossover,y=crossover.y,label=sprintf("%s is better", scens[left.highest]),hjust=1.1,vjust=0.5,color="grey50")+
-        annotate("text",x=crossover,y=crossover.y,label=sprintf("%s is better", scens[right.highest]),hjust=-0.1,vjust=0.5,color="grey50")+
+      p=p+annotate("text",x=crossover,y=crossover.y,label=sprintf("%s is better", scens[left.highest]),
+                 hjust=1.1,vjust=0.5,color="grey50",size=4)+
+        annotate("text",x=crossover,y=crossover.y,label=sprintf("%s is better", scens[right.highest]),
+                 hjust=-0.1,vjust=0.5,color="grey50",size=4)+
         geom_vline(xintercept=crossover,color="grey50",linetype="dotted")
       
       
