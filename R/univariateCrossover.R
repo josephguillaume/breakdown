@@ -1,11 +1,15 @@
 univariateCrossover <-
 function(equations.scen,equations.baseline,var,ranges){
+
     ranges=as.data.frame(ranges)
     stopifnot(all(c("Variable","Lower","Upper") %in% names(ranges)))
     
     ## Get functions for each scenario
-    f.scen=evalTermsFun(equations.scen,var,subset.args=FALSE)
-    f.baseline=evalTermsFun(equations.baseline,var,subset.args=FALSE)
+    if(is.function(equations.scen)) { f.scen=equations.scen
+    } else {f.scen=evalTermsFun(equations.scen,var,subset.args=FALSE)}
+      
+    if(is.function(equations.baseline)) {f.baseline=equations.baseline
+    } else {f.baseline=evalTermsFun(equations.baseline,var,subset.args=FALSE)}
     
     pts <- sapply(ranges$Variable,function(v){
         ranges0 <- subset(ranges,Variable==v)
