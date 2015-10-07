@@ -14,7 +14,7 @@ ranges0=subset(ranges.df,Variable=="greenfp_cereals")
 context("plotNPV")
 
 test_that("supports different input formats",{
-  pp=plotNPV(equations[,c(1,3,7,6)],"greenfp_cereals","total.water.footprint",ranges0.text,header[c(3,7,6)])
+  pp=plotNPV(equations[,c(1,3,7,6)],"greenfp_cereals","total.water.footprint",ranges0,header[c(3,7,6)])
   expect_equal(length(pp$layers),6) #3 lines, No annotations
   
   #Don't show annotations if no crossover point
@@ -42,6 +42,6 @@ test_that("function produced correct data",{
   
   #crossover point label
   expect_equal(pp2$data[[8]]$xintercept,4.19858176273603)
-  expect_true(pp$layers[[6]]$geom_params$label=="RD is better" && pp$layers[[6]]$geom_params$hjust==1.1)
-  expect_true(pp$layers[[7]]$geom_params$label=="A0 is better" && pp$layers[[7]]$geom_params$hjust==-0.1)
+  expect_true(pp$layers[[6]]$geom_params$label=="RD is higher" && pp$layers[[6]]$geom_params$hjust==1.1)
+  expect_true(pp$layers[[7]]$geom_params$label=="A0 is higher" && pp$layers[[7]]$geom_params$hjust==-0.1)
 })

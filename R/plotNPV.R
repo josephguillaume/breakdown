@@ -3,7 +3,7 @@
 ## y - dependent variable
 ## ranges0 - list with variables Min,Max
 ## scens - vector of scenario names to use in plot
-plotNPV<-function(equations,x,y,ranges0,scens){
+plotNPV<-function(equations,x,y,ranges0,scens,text_overlay=TRUE){
   fs=evalTermsFun(equations,y,subset.args=FALSE)
   
   stopifnot(length(fs)==length(scens))
@@ -52,7 +52,7 @@ plotNPV<-function(equations,x,y,ranges0,scens){
   p=eval(parse(text=tpl))
   
   ##Add background showing best alternative if there are only two equations
-  if(length(fs)==2){
+  if(text_overlay && length(fs)==2){
     
     #Calculate crossover
     crossover=univariateCrossover(fs[[1]],fs[[2]],ranges=ranges0)
@@ -65,16 +65,16 @@ plotNPV<-function(equations,x,y,ranges0,scens){
                                                       x,crossover+0.01*(ranges0$Upper-ranges0$Lower)))))
       
       #Add to plot
-      p=p+annotate("text",x=crossover,y=crossover.y,label=sprintf("%s is better", scens[left.highest]),
+      p=p+annotate("text",x=crossover,y=crossover.y,label=sprintf("%s is higher", scens[left.highest]),
                  hjust=1.1,vjust=0.5,color="grey50",size=4)+
-        annotate("text",x=crossover,y=crossover.y,label=sprintf("%s is better", scens[right.highest]),
+        annotate("text",x=crossover,y=crossover.y,label=sprintf("%s is higher", scens[right.highest]),
                  hjust=-0.1,vjust=0.5,color="grey50",size=4)+
         geom_vline(xintercept=crossover,color="grey50",linetype="dotted")
       
       
       # Alternative: align above bottom axis
-      #     p+annotate("text",x=crossover,y=0,label=sprintf("%s is better", scens[1]),hjust=-0.1,vjust=-0.5)+
-      #     annotate("text",x=crossover,y=0,label=sprintf("%s is better", scens[2]),hjust=1.1,vjust=-0.5)
+      #     p+annotate("text",x=crossover,y=0,label=sprintf("%s is higher", scens[1]),hjust=-0.1,vjust=-0.5)+
+      #     annotate("text",x=crossover,y=0,label=sprintf("%s is higher", scens[2]),hjust=1.1,vjust=-0.5)
     }
   }
   return(p)
