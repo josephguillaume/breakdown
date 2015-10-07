@@ -8,3 +8,4 @@ Maintainer: Joseph Guillaume <joseph.guillaume@gmail.com>
 Description: Hierarchical breakdown of an analysis and analysis of breakeven and cross-over points
 Depends: compiler,ggplot2
 License: GPL-3
+Suggests: testthat
