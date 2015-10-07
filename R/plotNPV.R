@@ -5,9 +5,13 @@
 ## scens - vector of scenario names to use in plot
 plotNPV<-function(equations,x,y,ranges0,scens){
   fs=evalTermsFun(equations,y,subset.args=FALSE)
+  
+  stopifnot(length(fs)==length(scens))
+  
   ## Use a list even for a single function
   if(is.function(fs)) fs=list(fs)
   if(is.null(ranges0[["Best"]])) ranges0[["Best"]]=formals(fs[[1]])[[x]]
+  
   ## Template of the ggplot command
   tpl="
   ggplot()+
@@ -43,6 +47,33 @@ plotNPV<-function(equations,x,y,ranges0,scens){
                 stat_function(fun=function(x){
                     sapply(x,function(x2) fs[[%d]](%s=x2))
                 },aes(linetype='%s',size='%s',colour='%s'))",tpl,i,x,scen.name,scen.name,scen.name)
-    }
-  eval(parse(text=tpl))
   }
+  
+  p=eval(parse(text=tpl))
+  
+  ##Add background showing best alternative if there are only two equations
+  if(length(fs)==2){
+    
+    #Calculate crossover
+    crossover=univariateCrossover(fs[[1]],fs[[2]],ranges=ranges0)
+    
+    if(!is.na(crossover)){
+      crossover.y=eval(parse(text=sprintf("fs[[1]](%s=%f)",x,crossover)))
+      left.highest=which.max(eval(parse(text=sprintf("sapply(1:2,function(i) fs[[i]](%s=%f))",
+                                                     x,crossover-0.01*(ranges0$Upper-ranges0$Lower)))))
+      right.highest=which.max(eval(parse(text=sprintf("sapply(1:2,function(i) fs[[i]](%s=%f))",
+                                                      x,crossover+0.01*(ranges0$Upper-ranges0$Lower)))))
+      
+      #Add to plot
+      p=p+annotate("text",x=crossover,y=crossover.y,label=sprintf("%s is better", scens[left.highest]),hjust=1.1,vjust=0.5,color="grey50")+
+        annotate("text",x=crossover,y=crossover.y,label=sprintf("%s is better", scens[right.highest]),hjust=-0.1,vjust=0.5,color="grey50")+
+        geom_vline(xintercept=crossover,color="grey50",linetype="dotted")
+      
+      
+      # Alternative: align above bottom axis
+      #     p+annotate("text",x=crossover,y=0,label=sprintf("%s is better", scens[1]),hjust=-0.1,vjust=-0.5)+
+      #     annotate("text",x=crossover,y=0,label=sprintf("%s is better", scens[2]),hjust=1.1,vjust=-0.5)
+    }
+  }
+  return(p)
+}
