@@ -21,10 +21,12 @@ var BivariateAnalysis = Backbone.Model.extend({
 	bivariateCrossover: function(){
 		if(!this.get("output")) return this;
 		if(this.get("vars").length!=2) return this;
-		console.log("bivariateCrossover");
 		var base=this.get("base");
 		var biv=this;
 		var ranges=base.getRanges(this.get("vars"),false);
+		if(ranges.Variable.length===0) return this;
+		
+		console.log("bivariateCrossover");
 		var req=ocpu.call("bivariateCrossover",{
 				'equations.scen':base.selectEqns([base.get('scens')[1]]),
 				'equations.baseline':base.selectEqns([base.get('scens')[0]]),
@@ -62,13 +64,15 @@ var BivOutputPlot = Backbone.View.extend({
 		if(!pom) return this;
 		console.log("BivOutputPlot render");
 		var ranges=this.model.get("base").getRanges(this.model.get("vars"),false);
+		var scens=this.model.get("base").get("scens");
+		var header=this.model.get("base").get("header");
 		var req=this.$el.rplot("biplot",{
 					'pom':pom,
 					'ranges':ranges,
 					'flip':this.model.get("flip"),
 					'equations':this.model.get("base").selectEqns(this.model.get("base").get("scens")),
 					'var':this.model.get("output"),
-					'scens':[this.model.get("header")[this.model.get("scens")[0]],this.model.get("header")[this.model.get("scens")[1]]]
+					'scens':[header[scens[0]],header[scens[1]]]
 		});
 		req.fail(function(){console.log(req.responseText);});
 		var view=this;

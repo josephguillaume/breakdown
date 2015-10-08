@@ -27,13 +27,16 @@ biplot=function(pom,ranges,flip=FALSE,text_overlay=TRUE,
     geom_vline(aes(xintercept=x,linetype="Limits"),data=data.frame(x=as.numeric(ranges[wvars[1],c("Min","Max")])),show_guide=TRUE)+
     geom_hline(aes(yintercept=x,linetype="Limits"),data=data.frame(x=as.numeric(ranges[wvars[2],c("Min","Max")])),show_guide=TRUE)+
     scale_linetype_manual(name="Values",values=c("Limits"="solid","Best guess"="dashed"))
-    
+  
   if(text_overlay){
-      if(missing(ordered_scens)){
-        ordered_scens=orderScensAtBestGuess(...)
-      }
+    if(missing(ordered_scens)){
+      ordered_scens=orderScensAtBestGuess(...)
+    }
     
-      p=p+annotate("text",x=ranges$Best[wvars[1]],y=ranges$Best[wvars[2]],hjust=-0.1,vjust=-0.5,color="grey50",size=4,
+    #Workaround so that grid loads directlabels before calling drawDetails.dlgrob
+    trace(directlabels::geom_dl,quote(recordGraphics(library(directlabels),list(),.GlobalEnv)),at=list(c(4,3,3,3,3,3,7)))
+    
+    p=p+annotate("text",x=ranges$Best[wvars[1]],y=ranges$Best[wvars[2]],hjust=-0.1,vjust=-0.5,color="grey50",size=4,
                  label=sprintf("At best guess, %s is higher",ordered_scens[1]))+
       geom_dl(aes(x=x1,y=x2),method=list(cex=0.7,"smart.grid"),color="grey50",
               label=sprintf("At crossover points,\n%s is equal to %s",ordered_scens[1],ordered_scens[2]))
