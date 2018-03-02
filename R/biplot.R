@@ -34,7 +34,8 @@ biplot=function(pom,ranges,flip=FALSE,text_overlay=TRUE,
     }
     
     #Workaround so that grid loads directlabels before calling drawDetails.dlgrob
-    trace(directlabels::geom_dl,quote(recordGraphics(library(directlabels),list(),.GlobalEnv)),at=list(c(4,3,3,3,3,3,7)))
+    #i.e. just before as.list(body(directlabels::geom_dl)[[2]][[3]][[4]][[3]][[10]]) for directlabels ‘2017.3.31’
+    trace(directlabels::geom_dl,quote(recordGraphics(library(directlabels),list(),.GlobalEnv)),at=list(c(2,3,4,3,10)))
     
     p=p+annotate("text",x=ranges$Best[wvars[1]],y=ranges$Best[wvars[2]],hjust=-0.1,vjust=-0.5,color="grey50",size=4,
                  label=sprintf("At best guess, %s is higher",ordered_scens[1]))+
