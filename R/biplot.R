@@ -22,10 +22,10 @@ biplot=function(pom,ranges,flip=FALSE,text_overlay=TRUE,
     geom_point(aes(color=level.of.concern))+
     scale_x_continuous(name=v1)+scale_y_continuous(name=v2)+
     scale_colour_gradient2(name="Level of concern",limits=c(0,100),low="#008800",mid="#FFA500",high="#FF0000",midpoint=50)+
-    geom_vline(aes(xintercept=x,linetype="Best guess"),data=data.frame(x=as.numeric(ranges[wvars[1],"Best"])),show_guide=TRUE)+
-    geom_hline(aes(yintercept=x,linetype="Best guess"),data=data.frame(x=as.numeric(ranges[wvars[2],"Best"])),show_guide=TRUE)+
-    geom_vline(aes(xintercept=x,linetype="Limits"),data=data.frame(x=as.numeric(ranges[wvars[1],c("Min","Max")])),show_guide=TRUE)+
-    geom_hline(aes(yintercept=x,linetype="Limits"),data=data.frame(x=as.numeric(ranges[wvars[2],c("Min","Max")])),show_guide=TRUE)+
+    geom_vline(aes(xintercept=x,linetype="Best guess"),data=data.frame(x=as.numeric(ranges[wvars[1],"Best"])),show.legend=TRUE)+
+    geom_hline(aes(yintercept=x,linetype="Best guess"),data=data.frame(x=as.numeric(ranges[wvars[2],"Best"])),show.legend=TRUE)+
+    geom_vline(aes(xintercept=x,linetype="Limits"),data=data.frame(x=as.numeric(ranges[wvars[1],c("Min","Max")])),show.legend=TRUE)+
+    geom_hline(aes(yintercept=x,linetype="Limits"),data=data.frame(x=as.numeric(ranges[wvars[2],c("Min","Max")])),show.legend=TRUE)+
     scale_linetype_manual(name="Values",values=c("Limits"="solid","Best guess"="dashed"))
   
   if(text_overlay){
