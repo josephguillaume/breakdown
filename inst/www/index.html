@@ -394,7 +394,7 @@
 				
 		var mult= new MultivarCrossover({base:analysis});
 		var multCheck = new MultivarCheckboxTable({model:mult,el:$("#mult_table"),template:$("#MultiVarRB_template")});
-		ocpu.seturl("/breakdown/R")
+		//ocpu.seturl("/breakdown/R")
 		//ocpu.seturl("http://josephguillaume.ocpu.io/breakdown/R")
 		var multOut= new MultivarResultsTable({model:mult,univariate:univ,el:$("#mult_output"),template:$("#MultiVarResultsTable_template")});
 		
