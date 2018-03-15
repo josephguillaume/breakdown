@@ -2,7 +2,7 @@
 biplot=function(pom,ranges,flip=FALSE,text_overlay=TRUE,
                 ordered_scens,...){
   ## Remove NAs, i.e. no crossover found
-  pom<-pom[!apply(pom,1,function(x) any(is.na(x))),]
+  pom<-pom[!apply(pom,1,function(x) any(is.na(x))),,drop=FALSE]
   if(nrow(pom)==0) stop("No breakeven points found for the variables selected")
   
   ranges=as.data.frame(ranges)
@@ -16,7 +16,7 @@ biplot=function(pom,ranges,flip=FALSE,text_overlay=TRUE,
   }
   wvars <- match(c(v1,v2),ranges$Variable)
   
-  perc.to.limit <- apply(pom[,c(v1,v2)],1,function(x) max(getNormalised(x,ranges$Best[wvars],ranges$Min[wvars],ranges$Max[wvars])))*100
+  perc.to.limit <- apply(pom[,c(v1,v2),drop=FALSE],1,function(x) max(getNormalised(x,ranges$Best[wvars],ranges$Min[wvars],ranges$Max[wvars])))*100
   
   p=ggplot(aes(x=x1,y=x2),data=data.frame(x1=pom[,v1],x2=pom[,v2],level.of.concern=100-perc.to.limit))+
     geom_point(aes(color=level.of.concern))+
