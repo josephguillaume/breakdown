@@ -74,7 +74,15 @@ var BivOutputPlot = Backbone.View.extend({
 					'var':this.model.get("output"),
 					'scens':[header[scens[0]],header[scens[1]]]
 		});
-		req.fail(function(){console.log(req.responseText);});
+		req.fail(function(){
+		  console.log(req.responseText);
+			$.messager.show({
+					title:'Error',
+					msg:req.responseText,
+					timeout:5000,
+					showType:'slide'
+					});
+		});
 		var view=this;
 		req.done(function(){
 			view.dirty=false;
