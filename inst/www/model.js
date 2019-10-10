@@ -165,7 +165,7 @@ var Analysis = Backbone.Model.extend({
 				// Return appropriate elements
 				return($.inArray(e[0],vars)>-1);
 			});
-		ranges.sort((e) => $.inArray(e[0],vars));
+		ranges.sort((a,b) => vars.indexOf(a[0])-vars.indexOf(b[0]));
 		if(asArray){ return(ranges); }
 		ranges = {
 			Variable:ranges.map(function(x){return x[0];}),
